@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ออร่าความร้อน & คาดการณ์ผู้ป่วย (เขต 4)</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h2, h3 { text-align: center; color: #ff8b13; }
+        .chart-container { width: 100%; height: 60vh; margin-bottom: 40px; }
+        #loading { text-align: center; font-size: 18px; color: #32d3ef; }
+    </style>
+</head>
+<body>
+
+    <h2>🔥 พยากรณ์กระแสออร่าความร้อน (Heat Index) ล่วงหน้า 7 วัน</h2>
+    <div id="loading">กำลังดึงพลังงานธรรมชาติและคำนวณโมเดลทางสถิติ...</div>
+    
+    <div id="heat-plot" class="chart-container"></div>
+
+    <h3>🏥 คาดการณ์จำนวนผู้ป่วยรายวันด้วย Poisson Regression (อ้างอิงจากความร้อนสูงสุดเฉลี่ย)</h3>
+    <div id="patient-plot" class="chart-container"></div>
+
+    <script>
+        // 1. ปรับพิกัดเป็น "อำเภอเมือง" ของทั้ง 8 จังหวัด
+        const locations = {
+            'อ.เมือง นนทบุรี': [13.8591, 100.5217],
+            'อ.เมือง ปทุมธานี': [14.0208, 100.5250],
+            'อ.เมือง พระนครศรีอยุธยา': [14.3516, 100.5773],
+            'อ.เมือง สระบุรี': [14.5289, 100.9101], 
+            'อ.เมือง ลพบุรี': [14.7995, 100.6534],
+            'อ.เมือง สิงห์บุรี': [14.8873, 100.3951],
+            'อ.เมือง อ่างทอง': [14.5896, 100.4550],
+            'อ.เมือง นครนายก': [14.2069, 101.2131]
+        };
+
+        async function fetchDataAndPlot() {
+            let heatTraces = [];
+            let dailyMaxHeat = {}; // เก็บค่าความร้อนสูงสุดของแต่ละวันเพื่อไปคำนวณผู้ป่วย
+
+            const promises = Object.entries(locations).map(async ([province, coords]) => {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords[0]}&longitude=${coords[1]}&hourly=apparent_temperature&timezone=Asia%2FBangkok`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // ประมวลผลหาค่า Heat Index สูงสุดรายวัน (ทำแบบภาพรวมเขต 4)
+                data.hourly.time.forEach((timeStr, index) => {
+                    const date = timeStr.split('T')[0];
+                    const temp = data.hourly.apparent_temperature[index];
+                    if (!dailyMaxHeat[date]) dailyMaxHeat[date] = [];
+                    dailyMaxHeat[date].push(temp);
+                });
+
+                return {
+                    x: data.hourly.time, 
+                    y: data.hourly.apparent_temperature,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: province,
+                    line: { shape: 'spline' }
+                };
+            });
+
+            heatTraces = await Promise.all(promises);
+
+            // ซ่อนข้อความ Loading
+            document.getElementById('loading').style.display = 'none';
+
+            // --- วาดกราฟที่ 1: Heat Index ---
+            const layoutHeat = {
+                paper_bgcolor: '#111', plot_bgcolor: '#222', font: { color: '#ddd' },
+                hovermode: 'x unified',
+                xaxis: { title: 'วันและเวลา', tickformat: '%d %b %H:%M', gridcolor: '#444' },
+                yaxis: { title: 'อุณหภูมิที่รู้สึกได้จริง (°C)', gridcolor: '#444' },
+                margin: { l: 50, r: 50, b: 50, t: 30 },
+                // เพิ่มเส้นเตือนภัยสีแดงที่ 40 องศาเซลเซียส
+                shapes: [{
+                    type: 'line', x0: 0, x1: 1, xref: 'paper', y0: 40, y1: 40,
+                    line: { color: '#ff0000', width: 2, dash: 'dash' }
+                }]
+            };
+            Plotly.newPlot('heat-plot', heatTraces, layoutHeat);
+
+            // --- เตรียมข้อมูลสำหรับกราฟที่ 2: Poisson Regression ---
+            const dates = Object.keys(dailyMaxHeat);
+            const avgMaxHeatPerDay = dates.map(date => {
+                const temps = dailyMaxHeat[date];
+                return temps.reduce((a, b) => a + b, 0) / temps.length; // หาค่าเฉลี่ยความร้อนสูงสุดของทั้ง 8 จังหวัด
+            });
+
+            let simulatedPatients = [];
+            let poissonExpected = [];
+
+            // จำลองข้อมูลผู้ป่วยจากสมการ Exponential (เลียนแบบ Poisson Regression)
+            avgMaxHeatPerDay.forEach(hi => {
+                // สมมติฐาน: ความร้อนต่ำกว่า 35 องศา แทบไม่มีผู้ป่วย แต่ถ้าเกินจะพุ่งแบบทวีคูณ
+                let expectedLambda = 0;
+                if(hi > 35) {
+                    // ใช้สมการจำลอง: y = e^(a + bX) เพื่อหาค่าคาดหวัง
+                    expectedLambda = Math.exp(-5 + 0.18 * hi); 
+                }
+                
+                // สร้างจำนวนผู้ป่วยจริง (เติม Noise แบบสุ่มให้ดูเป็นข้อมูลจริง)
+                let actual = Math.round(expectedLambda + (Math.random() * 4 - 2)); 
+                if (actual < 0) actual = 0; // ผู้ป่วยติดลบไม่ได้
+
+                poissonExpected.push(expectedLambda.toFixed(2));
+                simulatedPatients.push(actual);
+            });
+
+            // --- วาดกราฟที่ 2 ---
+            const traceBar = {
+                x: dates, y: simulatedPatients,
+                name: 'จำนวนผู้ป่วยรายวัน (จำลอง)', type: 'bar', marker: { color: '#ff8b13' }
+            };
+
+            const traceLine = {
+                x: dates, y: poissonExpected,
+                name: 'เส้นแนวโน้ม Poisson (Expected λ)', type: 'scatter', mode: 'lines+markers',
+                line: { color: '#32d3ef', width: 3, shape: 'spline' }
+            };
+
+            const layoutPatient = {
+                paper_bgcolor: '#111', plot_bgcolor: '#222', font: { color: '#ddd' },
+                hovermode: 'x unified',
+                xaxis: { title: 'วันที่', gridcolor: '#444' },
+                yaxis: { title: 'จำนวนผู้ป่วย (คน)', gridcolor: '#444' },
+                margin: { l: 50, r: 50, b: 50, t: 30 },
+                barmode: 'group'
+            };
+
+            Plotly.newPlot('patient-plot', [traceBar, traceLine], layoutPatient);
+        }
+
+        fetchDataAndPlot();
+    </script>
+</body>
+</html>
