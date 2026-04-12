@@ -98,18 +98,25 @@
             let simulatedPatients = [];
             let poissonExpected = [];
 
-            // จำลองข้อมูลผู้ป่วยจากสมการ Exponential (เลียนแบบ Poisson Regression)
+            // จำลองข้อมูลผู้ป่วยด้วยโมเดลความเสี่ยงสูงสุด (RR = 1.16 ตามงานวิจัย Phosri et al., 2019)
             avgMaxHeatPerDay.forEach(hi => {
-                // สมมติฐาน: ความร้อนต่ำกว่า 35 องศา แทบไม่มีผู้ป่วย แต่ถ้าเกินจะพุ่งแบบทวีคูณ
                 let expectedLambda = 0;
-                if(hi > 35) {
-                    // ใช้สมการจำลอง: y = e^(a + bX) เพื่อหาค่าคาดหวัง
-                    expectedLambda = Math.exp(-5 + 0.18 * hi); 
+                let actual = 0;
+
+                // เริ่มคำนวณเมื่อความร้อนเข้าสู่ระดับเฝ้าระวัง (เกิน 33 องศา)
+                if(hi > 33) {
+                    const intercept = -5.1947; // ค่า β0 สำหรับ Worst-case
+                    const coef_hi = 0.14842;   // ค่า β1 อ้างอิงความเสี่ยงเพิ่มขึ้น 16% ต่อองศา
+
+                    // สมการ Poisson: λ = exp(β0 + β1*X)
+                    expectedLambda = Math.exp(intercept + (coef_hi * hi)); 
+                    
+                    // สุ่มค่าผู้ป่วยจริงให้มีความผันแปรตามธรรมชาติ
+                    const noise = (Math.random() * 2 - 1) * Math.sqrt(expectedLambda);
+                    actual = Math.round(expectedLambda + noise);
                 }
                 
-                // สร้างจำนวนผู้ป่วยจริง (เติม Noise แบบสุ่มให้ดูเป็นข้อมูลจริง)
-                let actual = Math.round(expectedLambda + (Math.random() * 4 - 2)); 
-                if (actual < 0) actual = 0; // ผู้ป่วยติดลบไม่ได้
+                if (actual < 0) actual = 0;
 
                 poissonExpected.push(expectedLambda.toFixed(2));
                 simulatedPatients.push(actual);
