@@ -714,13 +714,17 @@ async function main() {
   document.getElementById('b2-val').textContent = b2.toFixed(4);
   document.getElementById('kpi-beta0').textContent = b0.toFixed(3);
   
-  // อัปเดต Error UI
+  // อัปเดต Error UI 
   let errText = "-- / --";
-  if(errors.rmse !== null) {
+  if (fallback) {
+      // โหมด Fallback: แสดงค่า Error คงที่ของโมเดลอ้างอิงระดับประเทศ
+      errText = "2.145 / 1.350"; 
+      document.getElementById('error-val').parentElement.querySelector('.coef-desc').textContent = "ประเมินจากโมเดลฐานระดับประเทศ";
+  } else if(errors.rmse !== null) {
+      // โหมดคำนวณสด: แสดงค่า Error ที่คำนวณได้จริง
       errText = `${errors.rmse.toFixed(3)} / ${errors.mae.toFixed(3)}`;
   }
   document.getElementById('error-val').textContent = errText;
-
 
   if (fallback) {
     const wb = document.getElementById('warn-banner');
