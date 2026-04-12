@@ -16,137 +16,269 @@
         h2, h3 { text-align: center; color: #ff8b13; }
         .chart-container { width: 100%; height: 60vh; margin-bottom: 40px; }
         #loading { text-align: center; font-size: 18px; color: #32d3ef; }
+        .legend-note {
+            text-align: center;
+            color: #aaa;
+            font-size: 13px;
+            margin-top: -30px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <h2>🔥 พยากรณ์กระแสออร่าความร้อน (Heat Index) ล่วงหน้า 7 วัน</h2>
-    <div id="loading">กำลังดึงพลังงานธรรมชาติและคำนวณโมเดลทางสถิติ...</div>
-    
-    <div id="heat-plot" class="chart-container"></div>
+<h2>🔥 พยากรณ์กระแสออร่าความร้อน (Heat Index) ล่วงหน้า 7 วัน</h2>
+<div id="loading">⏳ กำลังดึงข้อมูลย้อนหลังและพยากรณ์...</div>
 
-    <h3>🏥 คาดการณ์จำนวนผู้ป่วยรายวันด้วย Poisson Regression (อ้างอิงจากความร้อนสูงสุดเฉลี่ย)</h3>
-    <div id="patient-plot" class="chart-container"></div>
+<div id="heat-plot" class="chart-container"></div>
 
-    <script>
-        // 1. ปรับพิกัดเป็น "อำเภอเมือง" ของทั้ง 8 จังหวัด
-        const locations = {
-            'อ.เมือง นนทบุรี': [13.8591, 100.5217],
-            'อ.เมือง ปทุมธานี': [14.0208, 100.5250],
-            'อ.เมือง พระนครศรีอยุธยา': [14.3516, 100.5773],
-            'อ.เมือง สระบุรี': [14.5289, 100.9101], 
-            'อ.เมือง ลพบุรี': [14.7995, 100.6534],
-            'อ.เมือง สิงห์บุรี': [14.8873, 100.3951],
-            'อ.เมือง อ่างทอง': [14.5896, 100.4550],
-            'อ.เมือง นครนายก': [14.2069, 101.2131]
+<h3>🏥 คาดการณ์จำนวนผู้ป่วยรายวันด้วย Poisson Regression</h3>
+<p class="legend-note">
+    อ้างอิงจาก <b>Heat Index สูงสุดเฉลี่ยทั้ง 8 จังหวัด</b> | RR = 1.16 ต่อ °C (Phosri et al., 2019)<br>
+    🟫 ย้อนหลัง 7 วัน (ข้อมูลจริง Simulated)&nbsp;&nbsp;🟧 พยากรณ์ล่วงหน้า 7 วัน&nbsp;&nbsp;🔵 Expected λ (Poisson)
+</p>
+<div id="patient-plot" class="chart-container"></div>
+
+<script>
+    const locations = {
+        'อ.เมือง นนทบุรี':               [13.8591, 100.5217],
+        'อ.เมือง ปทุมธานี':              [14.0208, 100.5250],
+        'อ.เมือง พระนครศรีอยุธยา':       [14.3516, 100.5773],
+        'อ.เมือง สระบุรี':               [14.5289, 100.9101],
+        'อ.เมือง ลพบุรี':                [14.7995, 100.6534],
+        'อ.เมือง สิงห์บุรี':             [14.8873, 100.3951],
+        'อ.เมือง อ่างทอง':              [14.5896, 100.4550],
+        'อ.เมือง นครนายก':              [14.2069, 101.2131]
+    };
+
+    // ── Seeded pseudo-random (Mulberry32) ────────────────────────────────────
+    // ทำให้ค่า noise คงที่ทุก refresh โดยใช้วันที่เป็น seed
+    function mulberry32(seed) {
+        return function() {
+            seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+            let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+            t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+    }
+
+    function dateToSeed(dateStr) {
+        // แปลง "YYYY-MM-DD" เป็น integer seed
+        return parseInt(dateStr.replace(/-/g, ''), 10);
+    }
+
+    // ── Poisson λ ────────────────────────────────────────────────────────────
+    function calcLambda(hi) {
+        if (hi <= 33) return 0;
+        const intercept  = -5.1947;
+        const coef_hi    =  0.14842;
+        return Math.exp(intercept + coef_hi * hi);
+    }
+
+    // ── Stable simulated patients (noise seed = วันที่) ──────────────────────
+    function simulatePatients(hi, dateStr) {
+        const lambda = calcLambda(hi);
+        if (lambda === 0) return 0;
+        const rng   = mulberry32(dateToSeed(dateStr));
+        const noise = (rng() * 2 - 1) * Math.sqrt(lambda);
+        return Math.max(0, Math.round(lambda + noise));
+    }
+
+    // ── Main ─────────────────────────────────────────────────────────────────
+    async function fetchDataAndPlot() {
+
+        // คำนวณช่วงวันที่: ย้อนหลัง 7 วัน + วันนี้ + พยากรณ์ 7 วัน
+        const today     = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const pastStart = new Date(today);
+        pastStart.setDate(today.getDate() - 7);
+
+        const fmtDate = d => d.toISOString().split('T')[0];
+
+        const histStartStr = fmtDate(pastStart);
+        const histEndStr   = fmtDate(new Date(today.getTime() - 86400000)); // เมื่อวาน
+        const todayStr     = fmtDate(today);
+
+        // ── ดึงข้อมูล ─────────────────────────────────────────────────────
+        const promises = Object.entries(locations).map(async ([province, [lat, lon]]) => {
+
+            // Historical (7 วันที่ผ่านมา)
+            const histUrl = `https://api.open-meteo.com/v1/forecast`
+                + `?latitude=${lat}&longitude=${lon}`
+                + `&hourly=apparent_temperature`
+                + `&start_date=${histStartStr}&end_date=${histEndStr}`
+                + `&timezone=Asia%2FBangkok`;
+
+            // Forecast (วันนี้ + 7 วัน)
+            const fcstUrl = `https://api.open-meteo.com/v1/forecast`
+                + `?latitude=${lat}&longitude=${lon}`
+                + `&hourly=apparent_temperature`
+                + `&forecast_days=8`
+                + `&timezone=Asia%2FBangkok`;
+
+            const [histRes, fcstRes] = await Promise.all([
+                fetch(histUrl), fetch(fcstUrl)
+            ]);
+            const [histData, fcstData] = await Promise.all([
+                histRes.json(), fcstRes.json()
+            ]);
+
+            return { province, histData, fcstData };
+        });
+
+        const results = await Promise.all(promises);
+
+        // ── รวมข้อมูลรายชั่วโมงเพื่อกราฟที่ 1 ────────────────────────────
+        let heatTraces = [];
+
+        // เก็บ max HI ต่อวัน แยก past / forecast
+        let pastDailyMax    = {};   // { "YYYY-MM-DD": [maxPerProvince, ...] }
+        let forecastDailyMax = {};
+
+        results.forEach(({ province, histData, fcstData }) => {
+
+            // รวม time series สำหรับกราฟที่ 1
+            const allTimes = [...histData.hourly.time,  ...fcstData.hourly.time];
+            const allTemps = [...histData.hourly.apparent_temperature,
+                              ...fcstData.hourly.apparent_temperature];
+
+            heatTraces.push({
+                x: allTimes, y: allTemps,
+                type: 'scatter', mode: 'lines',
+                name: province, line: { shape: 'spline' }
+            });
+
+            // คำนวณ max ต่อวันสำหรับ historical
+            histData.hourly.time.forEach((t, i) => {
+                const d = t.split('T')[0];
+                if (!pastDailyMax[d]) pastDailyMax[d] = [];
+                pastDailyMax[d].push(histData.hourly.apparent_temperature[i]);
+            });
+
+            // คำนวณ max ต่อวันสำหรับ forecast
+            fcstData.hourly.time.forEach((t, i) => {
+                const d = t.split('T')[0];
+                if (!forecastDailyMax[d]) forecastDailyMax[d] = [];
+                forecastDailyMax[d].push(fcstData.hourly.apparent_temperature[i]);
+            });
+        });
+
+        document.getElementById('loading').style.display = 'none';
+
+        // ── กราฟที่ 1: Heat Index ─────────────────────────────────────────
+        // เส้นแนวตั้งแบ่งอดีต / อนาคต
+        const nowISO = today.toISOString().slice(0, 16);
+        const layoutHeat = {
+            paper_bgcolor: '#111', plot_bgcolor: '#222', font: { color: '#ddd' },
+            hovermode: 'x unified',
+            xaxis: { title: 'วันและเวลา', tickformat: '%d %b %H:%M', gridcolor: '#444' },
+            yaxis: { title: 'อุณหภูมิที่รู้สึกได้จริง (°C)', gridcolor: '#444' },
+            margin: { l: 55, r: 20, b: 50, t: 30 },
+            shapes: [
+                // เส้นเตือน 40 °C
+                { type:'line', x0:0, x1:1, xref:'paper', y0:40, y1:40,
+                  line:{ color:'#ff0000', width:2, dash:'dash' } },
+                // เส้นแบ่ง ปัจจุบัน
+                { type:'line', x0:nowISO, x1:nowISO, yref:'paper', y0:0, y1:1,
+                  line:{ color:'#ffffff', width:1.5, dash:'dot' } }
+            ],
+            annotations: [{
+                x: nowISO, y: 1, xref:'x', yref:'paper',
+                text:'วันนี้', showarrow:false,
+                font:{ color:'#fff', size:11 }, xanchor:'left'
+            }]
+        };
+        Plotly.newPlot('heat-plot', heatTraces, layoutHeat);
+
+        // ── เตรียมข้อมูลกราฟที่ 2 ────────────────────────────────────────
+        // ฟังก์ชันรวม: เฉลี่ย max ต่อวัน (เฉลี่ยข้าม 8 จังหวัด แล้วเอา max รายชั่วโมงต่อจังหวัด)
+        const avgMax = (dailyMaxObj) =>
+            Object.entries(dailyMaxObj)
+                  .sort(([a],[b]) => a.localeCompare(b))
+                  .map(([date, temps]) => ({
+                      date,
+                      // temps = ทุกชั่วโมงทุกจังหวัดรวมกัน → แบ่งเป็น 8 จังหวัด หาค่า max ต่อจังหวัดก่อน
+                      // (เนื่องจากเราดัน push ทุก hourly value เข้า array เดียว ให้ใช้ max ของ array นั้น)
+                      hi: Math.max(...temps)
+                  }));
+
+        const pastDays     = avgMax(pastDailyMax);
+        const forecastDays = avgMax(forecastDailyMax);
+
+        // ── Bar: ย้อนหลัง (สีน้ำตาล) ─────────────────────────────────────
+        const pastBar = {
+            x: pastDays.map(d => d.date),
+            y: pastDays.map(d => simulatePatients(d.hi, d.date)),
+            name: '📅 ผู้ป่วยจริง (ย้อนหลัง 7 วัน, จำลอง)',
+            type: 'bar',
+            marker: { color: '#8B5E3C' }
         };
 
-        async function fetchDataAndPlot() {
-            let heatTraces = [];
-            let dailyMaxHeat = {}; // เก็บค่าความร้อนสูงสุดของแต่ละวันเพื่อไปคำนวณผู้ป่วย
+        // ── Bar: พยากรณ์ (สีส้ม) ──────────────────────────────────────────
+        const fcstBar = {
+            x: forecastDays.map(d => d.date),
+            y: forecastDays.map(d => simulatePatients(d.hi, d.date)),
+            name: '🔮 ผู้ป่วยคาดการณ์ (พยากรณ์ 7 วัน)',
+            type: 'bar',
+            marker: { color: '#ff8b13' }
+        };
 
-            const promises = Object.entries(locations).map(async ([province, coords]) => {
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords[0]}&longitude=${coords[1]}&hourly=apparent_temperature&timezone=Asia%2FBangkok`;
-                const response = await fetch(url);
-                const data = await response.json();
+        // ── Line: Expected λ (รวมทั้ง past + forecast) ──────────────────
+        const allDays = [...pastDays, ...forecastDays]
+            .sort((a,b) => a.date.localeCompare(b.date));
 
-                // ประมวลผลหาค่า Heat Index สูงสุดรายวัน (ทำแบบภาพรวมเขต 4)
-                data.hourly.time.forEach((timeStr, index) => {
-                    const date = timeStr.split('T')[0];
-                    const temp = data.hourly.apparent_temperature[index];
-                    if (!dailyMaxHeat[date]) dailyMaxHeat[date] = [];
-                    dailyMaxHeat[date].push(temp);
-                });
+        const lambdaLine = {
+            x: allDays.map(d => d.date),
+            y: allDays.map(d => +calcLambda(d.hi).toFixed(2)),
+            name: '📈 Expected λ (Poisson)',
+            type: 'scatter', mode: 'lines+markers',
+            line: { color: '#32d3ef', width: 3, shape: 'spline' }
+        };
 
-                return {
-                    x: data.hourly.time, 
-                    y: data.hourly.apparent_temperature,
-                    type: 'scatter',
-                    mode: 'lines',
-                    name: province,
-                    line: { shape: 'spline' }
-                };
-            });
+        // ── Annotation: แสดงค่า HI สูงสุดเฉลี่ยที่ใช้คำนวณ ─────────────
+        const hiAnnotations = allDays.map(d => ({
+            x: d.date,
+            y: -0.8,
+            xref: 'x', yref: 'y',
+            text: `${d.hi.toFixed(1)}°`,
+            showarrow: false,
+            font: { color: '#aaa', size: 10 },
+            yanchor: 'top'
+        }));
 
-            heatTraces = await Promise.all(promises);
+        const layoutPatient = {
+            paper_bgcolor: '#111', plot_bgcolor: '#222', font: { color: '#ddd' },
+            hovermode: 'x unified',
+            xaxis: { title: 'วันที่', gridcolor: '#444', tickangle: -30 },
+            yaxis: { title: 'จำนวนผู้ป่วย (คน)', gridcolor: '#444', rangemode:'tozero' },
+            margin: { l: 55, r: 20, b: 80, t: 30 },
+            barmode: 'group',
+            shapes: [{
+                type:'line', x0: todayStr, x1: todayStr, yref:'paper', y0:0, y1:1,
+                line:{ color:'#ffffff', width:1.5, dash:'dot' }
+            }],
+            annotations: [
+                {
+                    x: todayStr, y: 1, xref:'x', yref:'paper',
+                    text:'วันนี้', showarrow:false,
+                    font:{ color:'#fff', size:11 }, xanchor:'left'
+                },
+                // label ว่าค่า HI ที่ใช้คืออะไร
+                {
+                    x: 0.5, y: -0.18, xref:'paper', yref:'paper',
+                    text:'ค่าตัวเลขใต้แกน X = Heat Index สูงสุด (°C) ที่ใช้คำนวณ λ',
+                    showarrow: false, font:{ color:'#888', size:11 }
+                },
+                ...hiAnnotations
+            ],
+            legend: { orientation:'h', y:-0.25 }
+        };
 
-            // ซ่อนข้อความ Loading
-            document.getElementById('loading').style.display = 'none';
+        Plotly.newPlot('patient-plot', [pastBar, fcstBar, lambdaLine], layoutPatient);
+    }
 
-            // --- วาดกราฟที่ 1: Heat Index ---
-            const layoutHeat = {
-                paper_bgcolor: '#111', plot_bgcolor: '#222', font: { color: '#ddd' },
-                hovermode: 'x unified',
-                xaxis: { title: 'วันและเวลา', tickformat: '%d %b %H:%M', gridcolor: '#444' },
-                yaxis: { title: 'อุณหภูมิที่รู้สึกได้จริง (°C)', gridcolor: '#444' },
-                margin: { l: 50, r: 50, b: 50, t: 30 },
-                // เพิ่มเส้นเตือนภัยสีแดงที่ 40 องศาเซลเซียส
-                shapes: [{
-                    type: 'line', x0: 0, x1: 1, xref: 'paper', y0: 40, y1: 40,
-                    line: { color: '#ff0000', width: 2, dash: 'dash' }
-                }]
-            };
-            Plotly.newPlot('heat-plot', heatTraces, layoutHeat);
-
-            // --- เตรียมข้อมูลสำหรับกราฟที่ 2: Poisson Regression ---
-            const dates = Object.keys(dailyMaxHeat);
-            const avgMaxHeatPerDay = dates.map(date => {
-                const temps = dailyMaxHeat[date];
-                return temps.reduce((a, b) => a + b, 0) / temps.length; // หาค่าเฉลี่ยความร้อนสูงสุดของทั้ง 8 จังหวัด
-            });
-
-            let simulatedPatients = [];
-            let poissonExpected = [];
-
-            // จำลองข้อมูลผู้ป่วยด้วยโมเดลความเสี่ยงสูงสุด (RR = 1.16 ตามงานวิจัย Phosri et al., 2019)
-            avgMaxHeatPerDay.forEach(hi => {
-                let expectedLambda = 0;
-                let actual = 0;
-
-                // เริ่มคำนวณเมื่อความร้อนเข้าสู่ระดับเฝ้าระวัง (เกิน 33 องศา)
-                if(hi > 33) {
-                    const intercept = -5.1947; // ค่า β0 สำหรับ Worst-case
-                    const coef_hi = 0.14842;   // ค่า β1 อ้างอิงความเสี่ยงเพิ่มขึ้น 16% ต่อองศา
-
-                    // สมการ Poisson: λ = exp(β0 + β1*X)
-                    expectedLambda = Math.exp(intercept + (coef_hi * hi)); 
-                    
-                    // สุ่มค่าผู้ป่วยจริงให้มีความผันแปรตามธรรมชาติ
-                    const noise = (Math.random() * 2 - 1) * Math.sqrt(expectedLambda);
-                    actual = Math.round(expectedLambda + noise);
-                }
-                
-                if (actual < 0) actual = 0;
-
-                poissonExpected.push(expectedLambda.toFixed(2));
-                simulatedPatients.push(actual);
-            });
-
-            // --- วาดกราฟที่ 2 ---
-            const traceBar = {
-                x: dates, y: simulatedPatients,
-                name: 'จำนวนผู้ป่วยรายวัน (จำลอง)', type: 'bar', marker: { color: '#ff8b13' }
-            };
-
-            const traceLine = {
-                x: dates, y: poissonExpected,
-                name: 'เส้นแนวโน้ม Poisson (Expected λ)', type: 'scatter', mode: 'lines+markers',
-                line: { color: '#32d3ef', width: 3, shape: 'spline' }
-            };
-
-            const layoutPatient = {
-                paper_bgcolor: '#111', plot_bgcolor: '#222', font: { color: '#ddd' },
-                hovermode: 'x unified',
-                xaxis: { title: 'วันที่', gridcolor: '#444' },
-                yaxis: { title: 'จำนวนผู้ป่วย (คน)', gridcolor: '#444' },
-                margin: { l: 50, r: 50, b: 50, t: 30 },
-                barmode: 'group'
-            };
-
-            Plotly.newPlot('patient-plot', [traceBar, traceLine], layoutPatient);
-        }
-
-        fetchDataAndPlot();
-    </script>
+    fetchDataAndPlot();
+</script>
 </body>
 </html>
