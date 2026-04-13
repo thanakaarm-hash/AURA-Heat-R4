@@ -156,7 +156,7 @@
     <div class="logo-icon">🔥</div>
     <div class="logo-text">
       <strong>AURA HEAT R4</strong>
-      ระบบเฝ้าระวังความร้อน · เขตสุขภาพที่ 4 (พร้อมตัวแทนสเกลประเทศ)
+      ระบบเฝ้าระวังความร้อน · เขตสุขภาพที่ 4 
     </div>
   </div>
   <div class="header-right">
@@ -191,7 +191,7 @@
   </div>
 
   <div class="section-label">GEOGRAPHIC DISTRIBUTION</div>
-  <div class="section-title">📍 แผนที่เฝ้าระวังความร้อน 8 จังหวัด เขต 4 (Regional Focus)</div>
+  <div class="section-title">📍 แผนที่เฝ้าระวังความร้อน 8 จังหวัด เขต 4 </div>
   <div class="chart-wrap">
       <div id="map-container"></div>
   </div>
@@ -262,7 +262,7 @@
   </div>
 
   <div class="section-label">PATIENT FORECAST (MACRO & MICRO LEVEL)</div>
-  <div class="section-title">🏥 คาดการณ์ผู้ป่วยโรคจากความร้อน (เขต 4 ซ้อนทับระดับประเทศ)</div>
+  <div class="section-title">🏥 คาดการณ์ผู้ป่วยโรคจากความร้อน (ระดับประเทศและเขตสุขภาพที่ 4)</div>
   <div class="chart-wrap">
     <div class="chart-header">
       <div>
@@ -287,7 +287,7 @@
     ใช้สัมประสิทธิ์ความเสี่ยงจากงานวิจัย (Phosri et al. 2019, WHO 2021) ผสานกับน้ำหนักตัวแปรจากการเทรนโมเดล Negative Binomial Regression (NB2) ด้วยข้อมูลจริงระดับประเทศเทียบกับสภาพอากาศเขต 4 (HI_lag, Wind, Rain) <br>
     
     <strong>ข้อจำกัด:</strong>
-    ตัวเลขผู้ป่วยเป็นค่าคาดหมาย (Expected λ) ทอนสัดส่วนตามประชากรเขต 4 ประกาศ ปค. สิ้นปี 2568 ไม่ใช่จำนวนผู้ป่วยจริง · ใช้สภาพอากาศเขต 4 เป็น Proxy ของประเทศ อาจมีความคลาดเคลื่อนในวันที่ภาคอื่นมีสภาพอากาศต่างไปอย่างสุดขั้ว · ใช้เพื่อประเมินแนวโน้ม ไม่ใช่การวินิจฉัยทางคลินิก <br>
+    ตัวเลขผู้ป่วยเป็นค่าคาดหมาย (Expected λ) ทอนสัดส่วนตามประชากรเขต 4 ประกาศกรมการปกครอง สิ้นปี 2568 ไม่ใช่จำนวนผู้ป่วยจริง · ใช้สภาพอากาศเขต 4 เป็น Proxy ของประเทศ อาจมีความคลาดเคลื่อนในวันที่ภาคอื่นมีสภาพอากาศต่างไปอย่างสุดขั้ว · ใช้เพื่อประเมินแนวโน้ม ไม่ใช่การวินิจฉัยทางคลินิก <br>
     
     <strong>เวอร์ชัน:</strong> AURA HEAT R4 v3.2 (Macro-Micro Stacked NB2) · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้าเว็บ
     
@@ -459,7 +459,7 @@ async function main() {
   document.getElementById('formula-concrete').innerHTML = formulaStr;
 
   const statusEl = document.getElementById('model-status');
-  statusEl.innerHTML = `<img src="smart_sat_logo.png" class="status-logo" alt="SAT Logo" style="height: 24px; width: auto; margin-right: 8px;"> <span>MACRO-MICRO MODEL LOADED</span>`;
+  statusEl.innerHTML = `<img src="smart_sat_logo.png" class="status-logo" alt="SAT Logo" style="height: 24px; width: auto; margin-right: 8px;"> <span> ตรวจจับเร็ว-ตอบโต้ทัน-ป้องกันได้ </span>`;
   statusEl.style.borderColor = '#00ff88'; statusEl.style.color = '#00ff88'; statusEl.style.boxShadow = '0 0 12px rgba(0, 255, 136, 0.2)';
 
   setProgress(55, '🌫️ กำลังดึง PM2.5 จาก WAQI...');
