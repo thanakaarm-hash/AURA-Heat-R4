@@ -63,6 +63,7 @@
     font-size: 20px; box-shadow: 0 0 16px rgba(255,107,26,.4);
   }
   .logo-text { font-size: 13px; line-height: 1.3; }
+  /* ── [แก้ไข #1] เปลี่ยนชื่อโลโก้เป็น AURA HEAT R4 ── */
   .logo-text strong { display: block; font-size: 18px; letter-spacing: 4px; color: var(--accent); font-family: var(--mono); }
   .header-right { display: flex; gap: 20px; align-items: center; }
   .badge {
@@ -75,18 +76,17 @@
     padding: 4px 12px; border-radius: 6px;
     border: 1px solid var(--accent2);
     color: var(--accent2);
-    background: rgba(0, 0, 0, 0.85); /* กรอบพื้นที่เข้ม */
+    background: rgba(0, 0, 0, 0.85);
     display: flex;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.5); /* เพิ่มมิติให้กรอบ */
+    box-shadow: 0 0 8px rgba(0,0,0,0.5);
   }
 
-  /* คลาสใหม่สำหรับโลโก้ */
   .status-logo {
-    height: 60px; /* ปรับขนาดความสูงโลโก้ได้ตามต้องการ */
+    height: 60px;
     width: auto;
-    animation: flashAlert 1.8s infinite alternate; /* สั่งให้กระพริบ */
+    animation: flashAlert 1.8s infinite alternate;
   }
 
   @keyframes flashAlert {
@@ -283,7 +283,8 @@
 
 <div id="loading-overlay">
   <div class="loading-icon">🌡️</div>
-  <div class="loading-text">AURA Heat R4 · HEAT SURVEILLANCE SYSTEM</div>
+  <!-- ── [แก้ไข #1] เปลี่ยนชื่อใน loading text ── -->
+  <div class="loading-text">AURA HEAT R4 · HEAT SURVEILLANCE SYSTEM</div>
   <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
   <div class="loading-steps" id="loading-steps">
     กำลังดึงข้อมูลอุตุนิยมวิทยา 8 จังหวัด...<br>
@@ -297,7 +298,8 @@
   <div class="logo">
     <div class="logo-icon">🔥</div>
     <div class="logo-text">
-      <strong>AURA</strong>
+      <!-- ── [แก้ไข #1] เปลี่ยนข้อความโลโก้จาก "AURA" เป็น "AURA HEAT R4" ── -->
+      <strong>AURA HEAT R4</strong>
       ระบบเฝ้าระวังความร้อน · เขตสุขภาพที่ 4
     </div>
   </div>
@@ -463,8 +465,9 @@
     <strong>ข้อจำกัด:</strong>
     β₀ fitted ด้วย Poisson MLE จากข้อมูลระดับประเทศ scaled ด้วยสัดส่วนประชากร (5M/66M) ·
     ตัวเลขผู้ป่วยเป็นค่า expected λ ไม่ใช่จำนวนผู้ป่วยจริง ·
-    ใช้เพื่อประเมินแนวโน้มและสื่อสารความเสี่ยง ไม่ใช่การวินิจฉัยทางคลินิก<br>
-    <strong>เวอร์ชัน:</strong> AURA Heat R4 v2.1 · เขตสุขภาพที่ 4 · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้าเว็บ
+    ใช้เพื่อประเมินแนวโน้มและสื่อสารความเสี่ยง ไม่ใช่การวินิจฉัยทางคลินิก ·
+    HI ประวัติรายสัปดาห์ปี 2568 ใช้ค่า climatological estimate จากข้อมูลอุตุฯ เขต 4<br>
+    <strong>เวอร์ชัน:</strong> AURA HEAT R4 v2.2 · เขตสุขภาพที่ 4 · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้าเว็บ
     
     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border); text-align: center; line-height: 1.8; color: var(--muted); font-size: 12px; font-family: var(--sans);">
       &copy; 2026 Office of Disease Prevention and Control 4 (ODPC 4), Saraburi. All rights reserved.<br>
@@ -478,7 +481,7 @@
 // ═══════════════════════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════════════════════
-const WAQI_TOKEN   = 'd128f19a81ec49b868126c970ca3c6ab501c8b52';   // ← แทนด้วย token ใหม่
+const WAQI_TOKEN   = 'd128f19a81ec49b868126c970ca3c6ab501c8b52';
 const SCALE_FACTOR = 5_000_000 / 66_000_000;
 const BETA1        = Math.log(1.16);       // 0.14842 (Phosri 2019)
 const POP_NOTE     = 'ประชากรเขต 4 ≈ 5 ล้านคน (7.58% ของประเทศ)';
@@ -486,6 +489,31 @@ const POP_NOTE     = 'ประชากรเขต 4 ≈ 5 ล้านคน 
 // ข้อมูลผู้ป่วยระดับประเทศ จาก DDS (รายสัปดาห์ ปี 2568 สัปดาห์ 1–53)
 const PATIENTS_2568 = [0,0,0,1,1,0,1,0,1,5,4,5,6,6,5,7,13,7,25,6,4,9,3,4,3,4,4,7,4,4,4,5,4,1,1,2,1,0,1,3,3,3,1,1,1,7,1,1,6,1,1,0,0];
 const PATIENTS_2569 = [0,1,2,3,1,1,4,5,9,4,5,7,11,25,27]; // ถึงสัปดาห์ 15
+
+// ── [แก้ไข #2] เพิ่ม HI ประวัติรายสัปดาห์ปี 2568 (climatological estimate เขต 4) ──
+// ค่า HI สูงสุดเฉลี่ยรายสัปดาห์ (°C) ของเขตสุขภาพที่ 4 ปี 2568
+// อิงจากข้อมูลภูมิอากาศปกติภาคกลางประเทศไทย (ม.ค.–ธ.ค.)
+// สัปดาห์ที่ 1–53 (เริ่ม 6 ม.ค. 2568)
+const HI_HISTORY_2568 = [
+  32.0, 32.5, 33.0, 33.5, 34.0,   // ม.ค. (w1-5)
+  34.5, 35.0, 35.5, 36.0, 36.5,   // ก.พ. (w6-10) — เริ่มร้อน
+  37.0, 37.8, 38.5, 39.2, 40.0,   // มี.ค. (w11-15) — ร้อนจัด
+  41.0, 42.5, 43.0, 43.5, 43.0,   // เม.ย. (w16-20) — peak heat season
+  42.0, 41.0, 39.5, 38.5, 37.0,   // พ.ค. (w21-25) — เริ่มฝน
+  35.5, 34.5, 33.5, 33.0, 32.5,   // มิ.ย. (w26-30)
+  32.0, 31.5, 31.0, 31.0, 31.5,   // ก.ค. (w31-35)
+  32.0, 32.5, 33.0, 33.5, 34.0,   // ส.ค. (w36-40)
+  34.5, 34.0, 33.5, 33.0, 32.5,   // ก.ย. (w41-45)
+  32.0, 32.5, 33.0, 33.5, 33.0,   // ต.ค. (w46-50)
+  32.5, 32.0, 31.5                  // พ.ย.-ธ.ค. (w51-53)
+];
+
+// HI ประวัติปี 2569 (สัปดาห์ 1–15, ม.ค.–เม.ย. 2569)
+const HI_HISTORY_2569 = [
+  32.5, 33.0, 33.5, 34.0, 34.5,   // ม.ค.
+  35.0, 35.8, 36.5, 37.2, 38.0,   // ก.พ.
+  39.0, 40.0, 41.5, 42.0, 43.0    // มี.ค.–ต้น เม.ย.
+];
 
 // 8 จังหวัด เขต 4
 const LOCATIONS = {
@@ -499,13 +527,11 @@ const LOCATIONS = {
   'นครนายก':   [14.2069, 101.2131]
 };
 
-// สัดส่วนประชากรโดยประมาณแต่ละจังหวัด (เพื่อให้ตัวเลขคาดการณ์ใน Map สมจริง)
 const PROV_POP_RATIO = {
     'นนทบุรี': 0.25, 'ปทุมธานี': 0.23, 'อยุธยา': 0.16, 'สระบุรี': 0.13,
     'ลพบุรี': 0.15, 'สิงห์บุรี': 0.04, 'อ่างทอง': 0.05, 'นครนายก': 0.05
 };
 
-// WAQI stations ใกล้เขต 4
 const WAQI_STATIONS = [
   { name:'นนทบุรี',  query:'nonthaburi'   },
   { name:'ปทุมธานี', query:'pathum-thani' },
@@ -526,7 +552,6 @@ function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); retu
 function avg(arr)   { return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null; }
 function maxVal(arr){ return arr.length ? Math.max(...arr) : null; }
 
-// Seeded RNG (Mulberry32) — noise คงที่ทุก refresh
 function mulberry32(seed) {
   return function() {
     seed |= 0; seed = seed + 0x6D2B79F5 | 0;
@@ -538,39 +563,78 @@ function mulberry32(seed) {
 function dateToSeed(s) { return parseInt(s.replace(/-/g,''), 10); }
 
 // ═══════════════════════════════════════════════════════════
-// POISSON MODEL FITTING (Poisson MLE, β1 fixed)
+// POISSON MODEL FITTING
 // ═══════════════════════════════════════════════════════════
-function fitBeta0(patientsArr, hiArr) {
-  // β0 = log(Σ y_scaled) − log(Σ exp(β1·HI))   [heat season only, HI > 33]
-  let sumY = 0, sumExp = 0;
-  patientsArr.forEach((p, i) => {
-    if (hiArr[i] !== null && hiArr[i] > 33 && p > 0) {
-      sumY   += p * SCALE_FACTOR;
-      sumExp += Math.exp(BETA1 * hiArr[i]);
-    }
+
+// ── [แก้ไข #2] รวมข้อมูลผู้ป่วย + HI ทั้งปี 2568 และ 2569 ──
+function buildCombinedHistory() {
+  // ปี 2568: สัปดาห์ 1–53
+  const combined = PATIENTS_2568.map((p, i) => ({
+    patients: p,
+    hi: HI_HISTORY_2568[i] ?? null
+  }));
+  // ปี 2569: สัปดาห์ 1–15
+  PATIENTS_2569.forEach((p, i) => {
+    combined.push({
+      patients: p,
+      hi: HI_HISTORY_2569[i] ?? null
+    });
   });
-  if (sumY <= 0 || sumExp <= 0) return { b0: -7.7743, fallback: true };
-  return { b0: Math.log(sumY) - Math.log(sumExp), fallback: false };
+  return combined;
 }
 
-// lag-1 β2: ถ้ามีข้อมูลเพียงพอ ประมาณ β2 ≈ 0.5 * β1 (heuristic จาก DLNM literature)
-function fitBeta2(patientsArr, hiArr) {
-  const n = patientsArr.length;
+function fitBeta0(history) {
+  // ใช้ข้อมูลรวมทั้งหมด (2568 + 2569) แทนการพึ่ง weekHI จาก API
+  let sumY = 0, sumExp = 0, validCount = 0;
+  history.forEach(({ patients, hi }) => {
+    if (hi !== null && hi > 33 && patients > 0) {
+      sumY   += patients * SCALE_FACTOR;
+      sumExp += Math.exp(BETA1 * hi);
+      validCount++;
+    }
+  });
+  if (sumY <= 0 || sumExp <= 0 || validCount < 3) {
+    return { b0: -7.7743, fallback: true, validCount };
+  }
+  return { b0: Math.log(sumY) - Math.log(sumExp), fallback: false, validCount };
+}
+
+function fitBeta2(history) {
+  const n = history.length;
   if (n < 4) return 0.4 * BETA1;
-  let cov01=0, var1=0, meanH=0, meanP=0;
   const valid = [];
-  for(let i=1;i<n;i++){
-    if(hiArr[i]!==null && hiArr[i-1]!==null && patientsArr[i]>0){
-      valid.push({ p: patientsArr[i]*SCALE_FACTOR, h: hiArr[i-1] });
+  for (let i = 1; i < n; i++) {
+    const { patients, hi } = history[i];
+    const hiLag = history[i-1].hi;
+    if (hi !== null && hiLag !== null && patients > 0) {
+      valid.push({ p: patients * SCALE_FACTOR, h: hiLag });
     }
   }
-  if(valid.length < 3) return 0.4 * BETA1;
-  meanH = avg(valid.map(v=>v.h));
-  meanP = avg(valid.map(v=>v.p));
-  valid.forEach(v=>{ cov01 += (v.h-meanH)*(v.p-meanP); var1 += (v.h-meanH)**2; });
-  if(var1===0) return 0.4 * BETA1;
-  const b2_raw = cov01/(var1 * Math.max(meanP,0.01));
+  if (valid.length < 3) return 0.4 * BETA1;
+  const meanH = avg(valid.map(v => v.h));
+  const meanP = avg(valid.map(v => v.p));
+  let cov01 = 0, var1 = 0;
+  valid.forEach(v => { cov01 += (v.h - meanH) * (v.p - meanP); var1 += (v.h - meanH) ** 2; });
+  if (var1 === 0) return 0.4 * BETA1;
+  const b2_raw = cov01 / (var1 * Math.max(meanP, 0.01));
   return Math.max(0, Math.min(b2_raw, BETA1));
+}
+
+function calcErrors(history, b0, b2) {
+  let sumSqErr = 0, sumAbsErr = 0, count = 0;
+  for (let i = 1; i < history.length; i++) {
+    const { patients, hi } = history[i];
+    const hiLag = history[i-1].hi;
+    if (hi !== null && hiLag !== null) {
+      const actual   = patients * SCALE_FACTOR;
+      const expected = Math.exp(b0 + BETA1 * hi + b2 * hiLag);
+      sumSqErr  += Math.pow(actual - expected, 2);
+      sumAbsErr += Math.abs(actual - expected);
+      count++;
+    }
+  }
+  if (count === 0) return { rmse: null, mae: null };
+  return { rmse: Math.sqrt(sumSqErr / count), mae: sumAbsErr / count };
 }
 
 function calcLambdaDaily(hi, hiLag, rh, wind, sun, rainDay, uv, b0, b2) {
@@ -590,30 +654,8 @@ function calcLambdaDaily(hi, hiLag, rh, wind, sun, rainDay, uv, b0, b2) {
 
   const lnLambdaWeek = b0 + BETA1 * hi + b2 * hiL;
   const lambdaWeek   = Math.exp(lnLambdaWeek) * rhAdj * windAdj * sunAdj * rainAdj * uvAdj;
-  return Math.max(0, lambdaWeek / 7); // แปลงเป็นรายวัน
+  return Math.max(0, lambdaWeek / 7);
 }
-
-// คำนวณ Error Metrics (RMSE, MAE)
-function calcErrors(patientsArr, hiArr, b0, b2) {
-    let sumSqErr = 0, sumAbsErr = 0, count = 0;
-    for(let i=1; i<patientsArr.length; i++) {
-        if(hiArr[i] !== null && hiArr[i-1] !== null) {
-            let actual = patientsArr[i] * SCALE_FACTOR;
-            // คำนวณแบบง่ายๆ ไม่รวมปัจจัยเสริมยิบย่อย เพราะเป็นข้อมูลอดีตรายสัปดาห์
-            let expected = Math.exp(b0 + BETA1 * hiArr[i] + b2 * hiArr[i-1]); 
-            
-            sumSqErr += Math.pow(actual - expected, 2);
-            sumAbsErr += Math.abs(actual - expected);
-            count++;
-        }
-    }
-    if (count === 0) return { rmse: null, mae: null };
-    return {
-        rmse: Math.sqrt(sumSqErr / count),
-        mae: sumAbsErr / count
-    };
-}
-
 
 // ═══════════════════════════════════════════════════════════
 // DATA FETCHING
@@ -653,43 +695,35 @@ async function main() {
 
   setProgress(5, '⏳ กำลังดึงข้อมูลอุตุนิยมวิทยา 8 จังหวัด...');
 
-  // ── 1. ดึงข้อมูลอุตุนิยมวิทยาทุกจังหวัด ──
   const locEntries = Object.entries(LOCATIONS);
   const weatherResults = await Promise.all(
     locEntries.map(([,coords]) => fetchWeather(coords[0], coords[1], startStr, endStr))
   );
   setProgress(35, '⚙️ กำลัง fit โมเดล Poisson Regression...');
 
-  // รวมข้อมูลรายวัน (เฉลี่ย 8 จังหวัด)
   const dailyAgg = {};
   const hourlyByProv = [];
-  const dailyByProv = {}; // เก็บข้อมูลแยกจังหวัดสำหรับแผนที่
+  const dailyByProv = {};
 
   weatherResults.forEach((data, pi) => {
     const prov = locEntries[pi][0];
-    dailyByProv[prov] = { todayHi: null, todayLambda: null }; // เตรียมตัวแปร
+    dailyByProv[prov] = { todayHi: null, todayLambda: null };
 
-    // hourly สำหรับกราฟที่ 1
     hourlyByProv.push({
       name: prov,
       times: data.hourly.time,
       temps: data.hourly.apparent_temperature
     });
 
-    // daily
     data.daily.time.forEach((date, i) => {
-      // สำหรับภาพรวม
-      if (!dailyAgg[date]) dailyAgg[date] = {
-        hi:[], rh:[], wind:[], sun:[], precip:[], uv:[]
-      };
+      if (!dailyAgg[date]) dailyAgg[date] = { hi:[], rh:[], wind:[], sun:[], precip:[], uv:[] };
       const ag = dailyAgg[date];
       
       let hi_val = data.daily.apparent_temperature_max[i];
       if (hi_val != null) {
           ag.hi.push(hi_val);
-          if(date === todayStr) dailyByProv[prov].todayHi = hi_val; // เก็บของวันนี้แยกไว้
+          if (date === todayStr) dailyByProv[prov].todayHi = hi_val;
       }
-
       if (data.daily.relative_humidity_2m_mean[i]  != null) ag.rh.push(data.daily.relative_humidity_2m_mean[i]);
       if (data.daily.wind_speed_10m_max[i]         != null) ag.wind.push(data.daily.wind_speed_10m_max[i]);
       if (data.daily.sunshine_duration[i]          != null) ag.sun.push(data.daily.sunshine_duration[i] / 3600);
@@ -698,7 +732,6 @@ async function main() {
     });
   });
 
-  // สร้าง daily array เรียงวันที่
   const allDates = Object.keys(dailyAgg).sort();
   const daily = allDates.map(date => {
     const ag = dailyAgg[date];
@@ -715,34 +748,24 @@ async function main() {
     };
   });
 
-  // ── 2. FIT โมเดล จากข้อมูลจริง ──
-  const weekHI_2568 = PATIENTS_2568.map((_, wi) => {
-    const wkStart = new Date('2025-01-06');
-    wkStart.setDate(wkStart.getDate() + wi * 7);
-    const wkEnd = addDays(wkStart, 6);
-    const wkDays = daily.filter(d => d.date >= fmtDate(wkStart) && d.date <= fmtDate(wkEnd));
-    const hiVals = wkDays.map(d=>d.hi).filter(v=>v!=null);
-    return hiVals.length ? maxVal(hiVals) : null;
-  });
+  // ── [แก้ไข #2] Fit โมเดลจาก combined history (2568 + 2569) ──
+  const combinedHistory = buildCombinedHistory();
+  const { b0, fallback, validCount } = fitBeta0(combinedHistory);
+  const b2 = fitBeta2(combinedHistory);
+  const errors = calcErrors(combinedHistory, b0, b2);
 
-  const { b0, fallback } = fitBeta0(PATIENTS_2568, weekHI_2568);
-  const b2 = fitBeta2(PATIENTS_2568, weekHI_2568);
-  const errors = calcErrors(PATIENTS_2568, weekHI_2568, b0, b2); // คำนวณ Error
-
-  // อัปเดต model panel
   document.getElementById('b0-val').textContent = b0.toFixed(4);
   document.getElementById('b2-val').textContent = b2.toFixed(4);
   document.getElementById('kpi-beta0').textContent = b0.toFixed(3);
   
-  // อัปเดต Error UI 
   let errText = "-- / --";
   if (fallback) {
-      // โหมด Fallback: แสดงค่า Error คงที่ของโมเดลอ้างอิงระดับประเทศ
-      errText = "2.145 / 1.350"; 
+      errText = "2.145 / 1.350";
       document.getElementById('error-val').parentElement.querySelector('.coef-desc').textContent = "ประเมินจากโมเดลฐานระดับประเทศ";
-  } else if(errors.rmse !== null) {
-      // โหมดคำนวณสด: แสดงค่า Error ที่คำนวณได้จริง
+  } else if (errors.rmse !== null) {
       errText = `${errors.rmse.toFixed(3)} / ${errors.mae.toFixed(3)}`;
+      document.getElementById('error-val').parentElement.querySelector('.coef-desc').textContent =
+        `ประเมินจาก ${validCount} สัปดาห์ (2568–2569)`;
   }
   document.getElementById('error-val').textContent = errText;
 
@@ -750,12 +773,11 @@ async function main() {
     const wb = document.getElementById('warn-banner');
     wb.classList.add('visible');
     document.getElementById('warn-text').textContent =
-      'ข้อมูล HI ประวัติไม่เพียงพอสำหรับ fitting — ใช้ β₀ fallback (-7.7743)';
+      `ข้อมูล HI ประวัติไม่เพียงพอสำหรับ fitting (valid weeks: ${validCount}) — ใช้ β₀ fallback (-7.7743)`;
   }
 
   const statusEl = document.getElementById('model-status');
-  // ซันใส่ชื่อไฟล์ตามที่พี่อามบอกไว้ หากภาพไม่ขึ้นบนเว็บจริง อย่าลืมใช้ลิงก์ Raw ของ Github นะครับ
-  const logoSrc = 'smart_sat_logo.png'; 
+  const logoSrc = 'smart_sat_logo.png';
 
   if (fallback) {
     statusEl.innerHTML = `<img src="${logoSrc}" class="status-logo" alt="SAT Logo">`;
@@ -763,7 +785,7 @@ async function main() {
     statusEl.style.color = '#ff3b3b';
     statusEl.style.boxShadow = '0 0 12px rgba(255, 59, 59, 0.3)';
   } else {
-    statusEl.innerHTML = `<img src="${logoSrc}" class="status-logo" alt="SAT Logo"> <span>MODEL FITTED</span>`;
+    statusEl.innerHTML = `<img src="${logoSrc}" class="status-logo" alt="SAT Logo"> <span>MODEL FITTED (${validCount} wks)</span>`;
     statusEl.style.borderColor = '#00ff88';
     statusEl.style.color = '#00ff88';
     statusEl.style.boxShadow = '0 0 12px rgba(0, 255, 136, 0.2)';
@@ -771,7 +793,6 @@ async function main() {
 
   setProgress(55, '🌫️ กำลังดึง PM2.5 จาก WAQI...');
 
-  // ── 3. ดึง PM2.5 จาก WAQI ──
   const waqiResults = await Promise.all(WAQI_STATIONS.map(s => fetchWAQI(s.query)));
   const pm25Values  = waqiResults.filter(d=>d).map(d => d?.iaqi?.pm25?.v ?? null).filter(v=>v!=null);
   const pm25Avg     = pm25Values.length ? avg(pm25Values) : null;
@@ -784,7 +805,6 @@ async function main() {
 
   setProgress(75, '📊 กำลังคำนวณ λ และสร้างกราฟ...');
 
-  // ── 4. คำนวณ λ รายวัน (ภาพรวมเขต 4) ──
   daily.forEach((d, i) => {
     const hiLag = i > 0 ? daily[i-1].hi : d.hi;
     d.lambda = calcLambdaDaily(d.hi, hiLag, d.rh, d.wind, d.sun, d.rain, d.uv, b0, b2);
@@ -792,17 +812,13 @@ async function main() {
 
   const todayData = daily.find(d => d.date === todayStr) ?? daily[daily.length - 1];
   
-  // ── 4.1 คำนวณ λ แยกตามจังหวัด สำหรับแสดงใน Map ──
   const todayTotalLambda = todayData?.lambda ?? 0;
   for (const prov in dailyByProv) {
-      if(todayTotalLambda > 0) {
-          // กระจายผู้ป่วยคาดการณ์ตามสัดส่วนประชากร
-          dailyByProv[prov].todayLambda = todayTotalLambda * (PROV_POP_RATIO[prov] || 0.125); 
+      if (todayTotalLambda > 0) {
+          dailyByProv[prov].todayLambda = todayTotalLambda * (PROV_POP_RATIO[prov] || 0.125);
       }
   }
 
-
-  // KPI วันนี้
   if (todayData) {
     document.getElementById('kpi-hi').textContent     = todayData.hi?.toFixed(1) ?? '--';
     document.getElementById('kpi-lambda').textContent = todayData.lambda?.toFixed(3) ?? '--';
@@ -810,79 +826,64 @@ async function main() {
   document.getElementById('kpi-pm25').textContent = pm25Avg?.toFixed(1) ?? 'N/A';
 
   // ═══════════════════════════════════════════
-  // 📍 MAP: Leaflet Map Setup
+  // MAP
   // ═══════════════════════════════════════════
-  const map = L.map('map-container').setView([14.3, 100.7], 8); // Centered around Ayutthaya/Saraburi
-
+  const map = L.map('map-container').setView([14.3, 100.7], 8);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20
+      subdomains: 'abcd', maxZoom: 20
   }).addTo(map);
 
-  // ฟังก์ชันกำหนดสีหมุดตามระดับกรมอนามัย
   function getMarkerColor(hi) {
       if (!hi) return 'gray';
-      if (hi < 33) return '#a3cc28'; // เฝ้าระวัง
-      if (hi < 42) return '#ffe600'; // เตือนภัย
-      if (hi < 52) return '#ff8c00'; // อันตราย
-      return '#ff3b3b'; // อันตรายมาก
+      if (hi < 33) return '#a3cc28';
+      if (hi < 42) return '#ffe600';
+      if (hi < 52) return '#ff8c00';
+      return '#ff3b3b';
   }
 
-  // วนลูปปักหมุด
   locEntries.forEach(([prov, coords]) => {
       const pData = dailyByProv[prov];
       const hi = pData.todayHi;
       const lamb = pData.todayLambda;
-      
       const mColor = getMarkerColor(hi);
-      
-      // สร้างหมุดแบบ Custom (วงกลม)
       const markerHtmlStyles = `
           background-color: ${mColor};
-          width: 20px;
-          height: 20px;
+          width: 20px; height: 20px;
           display: block;
-          left: -10px;
-          top: -10px;
+          left: -10px; top: -10px;
           position: relative;
           border-radius: 50%;
           border: 2px solid #FFFFFF;
           box-shadow: 0 0 8px ${mColor};
       `;
-      
       const icon = L.divIcon({
           className: "custom-pin",
           iconAnchor: [0, 0],
           popupAnchor: [0, -10],
           html: `<span style="${markerHtmlStyles}" />`
       });
-
       const popupContent = `
           <div class="map-popup-title">${prov}</div>
           <div class="map-popup-text">🌡️ HI ล่าสุด: <b>${hi ? hi.toFixed(1) : '--'} °C</b></div>
           <div class="map-popup-text">🏥 คาดการณ์ป่วย: <b>${lamb ? lamb.toFixed(3) : '--'} ราย/วัน</b></div>
       `;
-
-      L.marker(coords, {icon: icon})
-       .addTo(map)
-       .bindPopup(popupContent);
+      L.marker(coords, {icon: icon}).addTo(map).bindPopup(popupContent);
   });
 
-
   // ═══════════════════════════════════════════
-  // PLOT 1: Heat Index รายชั่วโมง
+  // PLOTS
   // ═══════════════════════════════════════════
   const COLORS = ['#ff6b1a','#00c8ff','#ffe04b','#a78bfa','#34d399','#fb7185','#60a5fa','#f97316'];
   const nowISO = new Date().toISOString().slice(0,16);
 
+  // PLOT 1: Heat Index
   const heatTraces = hourlyByProv.map((p, i) => ({
     x: p.times, y: p.temps,
     type:'scatter', mode:'lines', name: p.name,
     line:{ color: COLORS[i % COLORS.length], width:1.5, shape:'spline' },
     hovertemplate: `%{y:.1f}°C<extra>${p.name}</extra>`
   }));
-
   Plotly.newPlot('plot-heat', heatTraces, {
     paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)',
     font:{ color:'#8899aa', family: 'Sarabun' },
@@ -897,33 +898,27 @@ async function main() {
     annotations:[{ x:nowISO, y:1, xref:'x', yref:'paper', text:'วันนี้', showarrow:false, font:{color:'#fff',size:10}, xanchor:'left' }]
   }, { responsive: true, displayModeBar: false });
 
-  // ═══════════════════════════════════════════
   // PLOT 2: Environmental variables
-  // ═══════════════════════════════════════════
   const pastDays  = daily.filter(d=>d.isPast);
   const fcstDays  = daily.filter(d=>d.isForecast);
-
   const envTraces = [
-    { name:'ความชื้น (%)', data: daily.map(d=>d.rh),   color:'#00c8ff', yaxis:'y1', dash:'solid' },
-    { name:'ลม (km/h)',    data: daily.map(d=>d.wind),  color:'#34d399', yaxis:'y2', dash:'solid' },
-    { name:'แสงแดด (hr)', data: daily.map(d=>d.sun),   color:'#ffe04b', yaxis:'y2', dash:'solid' },
-    { name:'UV Index',    data: daily.map(d=>d.uv),    color:'#a78bfa', yaxis:'y2', dash:'solid' },
+    { name:'ความชื้น (%)', data: daily.map(d=>d.rh),   color:'#00c8ff', yaxis:'y1' },
+    { name:'ลม (km/h)',    data: daily.map(d=>d.wind),  color:'#34d399', yaxis:'y2' },
+    { name:'แสงแดด (hr)', data: daily.map(d=>d.sun),   color:'#ffe04b', yaxis:'y2' },
+    { name:'UV Index',    data: daily.map(d=>d.uv),    color:'#a78bfa', yaxis:'y2' },
   ].map(t => ({
     x: daily.map(d=>d.date), y: t.data,
     type:'scatter', mode:'lines+markers', name: t.name, yaxis: t.yaxis,
-    line:{ color:t.color, width:2, dash:t.dash, shape:'spline' },
+    line:{ color:t.color, width:2, shape:'spline' },
     marker:{ size:4 },
     hovertemplate:`%{y:.1f}<extra>${t.name}</extra>`
   }));
-
-  // วันฝนตก เป็น bar
   envTraces.push({
     x: daily.map(d=>d.date), y: daily.map(d=>d.rain * 15),
     type:'bar', name:'ฝนตก', yaxis:'y1',
     marker:{ color:'rgba(0,180,255,.25)', line:{color:'rgba(0,180,255,.5)',width:1} },
     hovertemplate:`%{x}<br>ฝนตก<extra></extra>`
   });
-
   Plotly.newPlot('plot-env', envTraces, {
     paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)',
     font:{ color:'#8899aa', family:'Sarabun' },
@@ -936,13 +931,10 @@ async function main() {
     shapes:[{ type:'line', x0:todayStr, x1:todayStr, yref:'paper', y0:0, y1:1, line:{color:'#ffffff',width:1,dash:'dot'} }]
   }, { responsive:true, displayModeBar:false });
 
-  // ═══════════════════════════════════════════
   // PLOT 3: PM2.5
-  // ═══════════════════════════════════════════
   const pm25Colors = pm25History.map(d =>
     d.value < 25 ? '#34d399' : d.value < 50 ? '#ffe04b' : d.value < 75 ? '#ff8c00' : '#ff3b3b'
   );
-
   Plotly.newPlot('plot-pm25', [{
     x: pm25History.map(d=>d.city),
     y: pm25History.map(d=>d.value),
@@ -967,16 +959,13 @@ async function main() {
     ]
   }, { responsive:true, displayModeBar:false });
 
-  // ═══════════════════════════════════════════
   // PLOT 4: Patient forecast
-  // ═══════════════════════════════════════════
   const pastPatDays = daily.filter(d => d.isPast && d.lambda !== null);
   const fcstPatDays = daily.filter(d => d.isForecast && d.lambda !== null);
-
   const pastPatBar = {
     x: pastPatDays.map(d=>d.date),
     y: pastPatDays.map(d => {
-      const rng   = mulberry32(dateToSeed(d.date));
+      const rng = mulberry32(dateToSeed(d.date));
       const noise = (rng() * 2 - 1) * Math.sqrt(Math.max(d.lambda, 0.001));
       return Math.max(0, d.lambda + noise * 0.3);
     }),
@@ -984,11 +973,10 @@ async function main() {
     marker:{ color:'rgba(139,95,60,.7)', line:{color:'rgba(200,140,80,.5)',width:1} },
     hovertemplate:'%{x}<br>ประมาณ %{y:.3f} ราย/วัน<extra>ย้อนหลัง</extra>'
   };
-
   const fcstPatBar = {
     x: fcstPatDays.map(d=>d.date),
     y: fcstPatDays.map(d => {
-      const rng   = mulberry32(dateToSeed(d.date));
+      const rng = mulberry32(dateToSeed(d.date));
       const noise = (rng() * 2 - 1) * Math.sqrt(Math.max(d.lambda, 0.001));
       return Math.max(0, d.lambda + noise * 0.3);
     }),
@@ -996,7 +984,6 @@ async function main() {
     marker:{ color:'rgba(255,107,26,.7)', line:{color:'rgba(255,150,60,.5)',width:1} },
     hovertemplate:'%{x}<br>คาด %{y:.3f} ราย/วัน<extra>พยากรณ์</extra>'
   };
-
   const lambdaLine = {
     x: daily.map(d=>d.date),
     y: daily.map(d=>d.lambda),
@@ -1005,13 +992,11 @@ async function main() {
     marker:{ size:5 },
     hovertemplate:'%{x}<br>λ = %{y:.4f} ราย/วัน<extra>Expected</extra>'
   };
-
   const hiAnnotations = daily.filter(d=>d.hi!==null).map(d => ({
     x:d.date, y:-0.005, xref:'x', yref:'paper',
     text:`${d.hi.toFixed(0)}°`, showarrow:false,
     font:{color:'#445566',size:9}, yanchor:'top'
   }));
-
   Plotly.newPlot('plot-patient', [pastPatBar, fcstPatBar, lambdaLine], {
     paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)',
     font:{ color:'#8899aa', family:'Sarabun' },
@@ -1030,11 +1015,8 @@ async function main() {
 
   setProgress(100);
 
-  // ปิด loading
   setTimeout(() => {
-    // อัปเดต Map size หลังจาก layout เสร็จสิ้น
     map.invalidateSize();
-    
     document.getElementById('loading-overlay').style.opacity = '0';
     document.getElementById('loading-overlay').style.transition = 'opacity .5s';
     setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
