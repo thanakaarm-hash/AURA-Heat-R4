@@ -63,7 +63,6 @@
     font-size: 20px; box-shadow: 0 0 16px rgba(255,107,26,.4);
   }
   .logo-text { font-size: 13px; line-height: 1.3; }
-  /* ── [แก้ไข #1] เปลี่ยนชื่อโลโก้เป็น AURA HEAT R4 ── */
   .logo-text strong { display: block; font-size: 18px; letter-spacing: 4px; color: var(--accent); font-family: var(--mono); }
   .header-right { display: flex; gap: 20px; align-items: center; }
   .badge {
@@ -71,7 +70,7 @@
     padding: 3px 10px; border-radius: 4px;
     border: 1px solid var(--border); color: var(--muted);
   }
- #model-status {
+  #model-status {
     font-family: var(--mono); font-size: 11px;
     padding: 4px 12px; border-radius: 6px;
     border: 1px solid var(--accent2);
@@ -213,16 +212,6 @@
   }
   .footnote strong { color: var(--text); }
 
-  /* ── Warning banner ── */
-  .warning-banner {
-    background: rgba(255,59,59,.08);
-    border: 1px solid rgba(255,59,59,.3);
-    border-radius: 8px; padding: 10px 16px;
-    font-size: 12px; color: #ff8080;
-    margin-bottom: 16px; display: none;
-  }
-  .warning-banner.visible { display: flex; align-items: center; gap: 8px; }
-
   /* ── กรมอนามัย Table ── */
   .health-table-wrap {
       overflow-x: auto;
@@ -283,12 +272,11 @@
 
 <div id="loading-overlay">
   <div class="loading-icon">🌡️</div>
-  <!-- ── [แก้ไข #1] เปลี่ยนชื่อใน loading text ── -->
   <div class="loading-text">AURA HEAT R4 · HEAT SURVEILLANCE SYSTEM</div>
   <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
   <div class="loading-steps" id="loading-steps">
     กำลังดึงข้อมูลอุตุนิยมวิทยา 8 จังหวัด...<br>
-    กำลัง fit โมเดล Poisson Regression...<br>
+    กำลังประมวลผลโมเดล Hybrid NB2...<br>
     กำลังดึง PM2.5 จาก WAQI...<br>
     กำลังสร้างแผนที่และกราฟ...
   </div>
@@ -298,14 +286,13 @@
   <div class="logo">
     <div class="logo-icon">🔥</div>
     <div class="logo-text">
-      <!-- ── [แก้ไข #1] เปลี่ยนข้อความโลโก้จาก "AURA" เป็น "AURA HEAT R4" ── -->
       <strong>AURA HEAT R4</strong>
       ระบบเฝ้าระวังความร้อน · เขตสุขภาพที่ 4
     </div>
   </div>
   <div class="header-right">
     <span class="badge">8 จังหวัด · ประชากร ~5 ล้านคน</span>
-    <span id="model-status">⬤ FITTING MODEL...</span>
+    <span id="model-status">⬤ LOADING MODEL...</span>
   </div>
 </header>
 
@@ -325,17 +312,13 @@
     <div class="kpi-card yellow">
       <div class="kpi-label">λ คาดการณ์วันนี้ (เขต 4)</div>
       <div class="kpi-value" id="kpi-lambda">--</div>
-      <div class="kpi-unit">ราย/วัน (Poisson expected)</div>
+      <div class="kpi-unit">ราย/วัน (NB2 Expected)</div>
     </div>
     <div class="kpi-card red">
-      <div class="kpi-label">β₀ (fitted จากข้อมูล DDS)</div>
-      <div class="kpi-value" id="kpi-beta0">--</div>
-      <div class="kpi-unit">intercept จาก Poisson MLE</div>
+      <div class="kpi-label">β₀ (Intercept)</div>
+      <div class="kpi-value" id="kpi-beta0">-14.327</div>
+      <div class="kpi-unit">จาก Local NB2 Model</div>
     </div>
-  </div>
-
-  <div class="warning-banner" id="warn-banner">
-    ⚠️ <span id="warn-text"></span>
   </div>
 
   <div class="section-label">GEOGRAPHIC DISTRIBUTION</div>
@@ -346,11 +329,11 @@
 
   <div class="model-panel">
     <div class="section-label">MODEL SPECIFICATION</div>
-    <div class="section-title">สมการ Poisson Regression</div>
+    <div class="section-title">สมการ Negative Binomial Regression (Hybrid)</div>
     
     <div class="formula" id="formula-display">
       <div style="color: var(--muted); font-size: 11px; margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 8px;">
-        ln(λ_t) = β₀ + β₁·HI_t + β₂·HI_(t-1) + β₃·RH_t + β₄·Wind_t + β₅·Sun_t + β₆·Rain_t + β₇·UV_t + β₈·PM2.5_t
+        ln(λ_t) = β₀ + β₁·HI_t + β₂·HI_(t-1) + β₃·Wind_t + β₄·Rain_t + β₅·PM2.5_t
       </div>
       <div id="formula-concrete" style="line-height: 1.8;">
         <span style="color: var(--muted);">กำลังโหลดพารามิเตอร์ของโมเดล...</span>
@@ -359,28 +342,29 @@
 
     <div style="font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: -6px; margin-bottom: 20px; padding-left: 4px; font-family: var(--sans);">
       <span style="color: var(--accent2); font-family: var(--mono);">[β₁] อ้างอิง Heat Index:</span> Phosri S. et al. (2019). EnvironmentAsia. (RR = 1.16/°C)<br>
-      <span style="color: var(--accent2); font-family: var(--mono);">[β₈] อ้างอิง PM2.5 (Synergistic Factor):</span> WHO Global Air Quality Guidelines (2021) & Brook et al. (2010). AHA Scientific Statement.
+      <span style="color: var(--accent2); font-family: var(--mono);">[β₅] อ้างอิง PM2.5 (Synergistic Factor):</span> WHO Global Air Quality Guidelines (2021)<br>
+      <span style="color: var(--accent3); font-family: var(--mono);">[β₀, β₂, β₃, β₄] Local Calibration:</span> พารามิเตอร์จากการเทรนด้วยข้อมูลจริงเขตสุขภาพที่ 4 (Negative Binomial NB2, 2026)
     </div>
     <div class="coef-grid" id="coef-grid">
       <div class="coef-card">
         <div class="coef-name">β₀ (intercept)</div>
-        <div class="coef-val" id="b0-val">fitting...</div>
-        <div class="coef-desc">fitted จากข้อมูล DDS + Poisson MLE</div>
+        <div class="coef-val" id="b0-val">-14.3268</div>
+        <div class="coef-desc">Fitted จาก Local NB2</div>
       </div>
       <div class="coef-card">
         <div class="coef-name">β₁ (HI_t)</div>
         <div class="coef-val">0.1484</div>
-        <div class="coef-desc">ln(RR=1.16) จาก Phosri et al. 2019</div>
+        <div class="coef-desc">อ้างอิงสากล (Phosri 2019)</div>
       </div>
       <div class="coef-card">
-        <div class="coef-name">β₂ (HI lag-1 สัปดาห์)</div>
-        <div class="coef-val" id="b2-val">fitting...</div>
-        <div class="coef-desc">ผลหน่วงเวลา 1 สัปดาห์ (≈ lag 7 วัน)</div>
+        <div class="coef-name">β₂ (HI_lag)</div>
+        <div class="coef-val" id="b2-val">0.2450</div>
+        <div class="coef-desc">ผลความร้อนสะสมสัปดาห์ก่อน (NB2)</div>
       </div>
       <div class="coef-card" style="border-color: var(--accent3);">
-        <div class="coef-name" style="color: var(--accent3);">Model Error (RMSE / MAE)</div>
-        <div class="coef-val" id="error-val" style="color: var(--accent3);">-- / --</div>
-        <div class="coef-desc">ประเมินจากข้อมูลย้อนหลัง</div>
+        <div class="coef-name" style="color: var(--accent3);">Status</div>
+        <div class="coef-val" id="error-val" style="color: var(--accent3);">HYBRID</div>
+        <div class="coef-desc">เทรนออฟไลน์สมบูรณ์</div>
       </div>
     </div>
   </div>
@@ -458,9 +442,9 @@
   <div class="chart-wrap">
     <div class="chart-header">
       <div>
-        <div class="chart-title">Poisson Regression · β₀ fitted จากข้อมูล DDS </div>
+        <div class="chart-title">Hybrid NB2 Regression Model</div>
         <div class="chart-subtitle">
-          ประชากรอ้างอิง 5 ล้านคน (7.58% ของประเทศ) · RR=1.16/°C (Phosri et al. 2019) · Lag = 1 สัปดาห์
+          ประชากรอ้างอิง 5 ล้านคน (7.58% ของประเทศ) · ปรับแก้ฐานผู้ป่วยระดับเขตแล้ว
         </div>
       </div>
     </div>
@@ -471,13 +455,12 @@
     <strong>แหล่งข้อมูล:</strong>
     Open-Meteo API (อุตุนิยมวิทยา) ·
     World Air Quality Index / WAQI (PM2.5) ·
-    DDS กรมควบคุมโรค (ข้อมูลผู้ป่วยระดับประเทศ ปี 2568–2569) ·
-    Phosri S. et al. (2019) EnvironmentAsia (RR = 1.16 ต่อ 1°C)<br>
+    DDS กรมควบคุมโรค (ข้อมูลผู้ป่วยระดับประเทศ ปี 2568–2569) <br>
+    <strong>พารามิเตอร์ Hybrid:</strong>
+    ใช้สัมประสิทธิ์ความเสี่ยงจากงานวิจัย (Phosri et al. 2019, WHO 2021) ผสานกับน้ำหนักตัวแปรจากการเทรนโมเดล Negative Binomial Regression (NB2) ด้วยข้อมูลจริงของเขตสุขภาพที่ 4 (HI_lag, Wind, Rain) <br>
     <strong>ข้อจำกัด:</strong>
-    β₀ fitted ด้วย Poisson MLE จากข้อมูลระดับประเทศ scaled ด้วยสัดส่วนประชากร (5M/66M) ·
-    ตัวเลขผู้ป่วยเป็นค่า expected λ ไม่ใช่จำนวนผู้ป่วยจริง ·
-    ใช้เพื่อประเมินแนวโน้มและสื่อสารความเสี่ยง ไม่ใช่การวินิจฉัยทางคลินิก <br>
-    <strong>เวอร์ชัน:</strong> AURA HEAT R4 v2.2 · เขตสุขภาพที่ 4 · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้าเว็บ
+    ตัวเลขผู้ป่วยเป็นค่าคาดหมาย (Expected λ) ไม่ใช่จำนวนผู้ป่วยจริง · ใช้เพื่อประเมินแนวโน้มและสื่อสารความเสี่ยง ไม่ใช่การวินิจฉัยทางคลินิก <br>
+    <strong>เวอร์ชัน:</strong> AURA HEAT R4 v3.0 (Hybrid NB2) · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้าเว็บ
     
     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border); text-align: center; line-height: 1.8; color: var(--muted); font-size: 12px; font-family: var(--sans);">
       &copy; 2026 Office of Disease Prevention and Control 4 (ODPC 4), Saraburi. All rights reserved.<br>
@@ -489,50 +472,12 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// CONSTANTS
+// CONSTANTS & HYBRID PARAMETERS
 // ═══════════════════════════════════════════════════════════
 const WAQI_TOKEN   = 'd128f19a81ec49b868126c970ca3c6ab501c8b52';
-const SCALE_FACTOR = 5_000_000 / 66_000_000;
-const BETA1        = Math.log(1.16);       // 0.14842 (Phosri 2019)
 const POP_NOTE     = 'ประชากรเขต 4 ≈ 5 ล้านคน (7.58% ของประเทศ)';
 
-// ข้อมูลผู้ป่วยระดับประเทศ จาก DDS (รายสัปดาห์ ปี 2568 สัปดาห์ 1–53)
-const PATIENTS_2568 = [0,0,0,1,1,0,1,0,1,5,4,5,6,6,5,7,13,7,25,6,4,9,3,4,3,4,4,7,4,4,4,5,4,1,1,2,1,0,1,3,3,3,1,1,1,7,1,1,6,1,1,0,0];
-const PATIENTS_2569 = [0,1,2,3,1,1,4,5,9,4,5,7,11,25,27]; // ถึงสัปดาห์ 15
-
-//  1. ข้อมูลพิกัด 8 จังหวัด เขต 4
-//กำหนดช่วงเวลา (ปี 2025/2568 ถึงปัจจุบัน ปี 2026/2569)
-// หมายเหตุ: เริ่ม 6 ม.ค. 2025 ตามโครงสร้างเดิม
-//start_date = "2025-01-06"
-//end_date = datetime.now().strftime("%Y-%m-%d") # ดึงจนถึงวันปัจจุบัน
-// 2. ดึงข้อมูลทุกจังหวัด
-//จาก Open-Meteo API...")
-//3. หาค่าเฉลี่ย HI ของทั้ง 8 จังหวัดในแต่ละวัน (เป็นตัวแทน เขต 4)
-// 4. จัดกลุ่มเป็นรายสัปดาห์ (เริ่มวันจันทร์ - จบวันอาทิตย์)
-// 5. แยกข้อมูลปี 2568 (2025) และ 2569 (2026)
-
-const HI_HISTORY_2568 = [
-  30.3, 29.9, 35.4, 33.4, 35.7,
-  37.4, 37.7, 37.4, 39.6, 40.7,
-  36.4, 40.8, 40.0, 40.8, 40.5,
-  42.3, 41.2, 41.2, 39.4, 40.7,
-  38.4, 40.2, 37.4, 39.1, 37.2,
-  36.5, 37.6, 38.1, 35.8, 38.7,
-  40.2, 37.3, 38.5, 36.6, 38.7,
-  38.2, 37.8, 36.6, 38.2, 38.7,
-  38.5, 36.6, 35.7, 35.7, 36.6,
-  30.0, 29.6, 35.6, 32.3, 34.0,
-  34.4,
-];
-
-const HI_HISTORY_2569 = [
-  33.2, 29.0, 34.1, 34.0, 34.6,
-  36.1, 37.7, 38.6, 39.2, 38.5,
-  36.8, 39.2, 41.1, 40.8, 41.2,
-  41.1,
-];
-
-// 8 จังหวัด เขต 4
+// ข้อมูลพิกัด 8 จังหวัด เขต 4
 const LOCATIONS = {
   'นนทบุรี':    [13.8591, 100.5217],
   'ปทุมธานี':   [14.0208, 100.5250],
@@ -567,7 +512,6 @@ function setProgress(pct, msg) {
 function fmtDate(d) { return d.toISOString().split('T')[0]; }
 function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
 function avg(arr)   { return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null; }
-function maxVal(arr){ return arr.length ? Math.max(...arr) : null; }
 
 function mulberry32(seed) {
   return function() {
@@ -580,108 +524,39 @@ function mulberry32(seed) {
 function dateToSeed(s) { return parseInt(s.replace(/-/g,''), 10); }
 
 // ═══════════════════════════════════════════════════════════
-// POISSON MODEL FITTING
+// THE HYBRID NB2 MODEL
 // ═══════════════════════════════════════════════════════════
-
-// ── [แก้ไข #2] รวมข้อมูลผู้ป่วย + HI ทั้งปี 2568 และ 2569 ──
-function buildCombinedHistory() {
-  // ปี 2568: สัปดาห์ 1–53
-  const combined = PATIENTS_2568.map((p, i) => ({
-    patients: p,
-    hi: HI_HISTORY_2568[i] ?? null
-  }));
-  // ปี 2569: สัปดาห์ 1–15
-  PATIENTS_2569.forEach((p, i) => {
-    combined.push({
-      patients: p,
-      hi: HI_HISTORY_2569[i] ?? null
-    });
-  });
-  return combined;
-}
-
-function fitBeta0(history, b2) {
-  let sumY = 0, sumExp = 0, validCount = 0;
-  
-  // เริ่มที่ i = 1 เพราะเราต้องใช้ประวัติของสัปดาห์ก่อนหน้า (hiLag)
-  for (let i = 1; i < history.length; i++) {
-    const { patients, hi } = history[i];
-    const hiLag = history[i-1].hi;
-
-    if (hi !== null && hiLag !== null && hi > 33 && patients > 0) {
-      sumY   += patients * SCALE_FACTOR;
-      // [แก้ไข] รวม b2 * hiLag เข้าไปใน exponent เพื่อให้ b0 หักลบค่านี้ออกไปแต่แรก
-      sumExp += Math.exp(BETA1 * hi + b2 * hiLag);
-      validCount++;
-    }
-  }
-
-  if (sumY <= 0 || sumExp <= 0 || validCount < 3) {
-    return { b0: -7.7743, fallback: true, validCount };
-  }
-  return { b0: Math.log(sumY) - Math.log(sumExp), fallback: false, validCount };
-}
-
-function fitBeta2(history) {
-  const n = history.length;
-  if (n < 4) return 0.4 * BETA1;
-  const valid = [];
-  for (let i = 1; i < n; i++) {
-    const { patients, hi } = history[i];
-    const hiLag = history[i-1].hi;
-    if (hi !== null && hiLag !== null && patients > 0) {
-      valid.push({ p: patients * SCALE_FACTOR, h: hiLag });
-    }
-  }
-  if (valid.length < 3) return 0.4 * BETA1;
-  const meanH = avg(valid.map(v => v.h));
-  const meanP = avg(valid.map(v => v.p));
-  let cov01 = 0, var1 = 0;
-  valid.forEach(v => { cov01 += (v.h - meanH) * (v.p - meanP); var1 += (v.h - meanH) ** 2; });
-  if (var1 === 0) return 0.4 * BETA1;
-  const b2_raw = cov01 / (var1 * Math.max(meanP, 0.01));
-  return Math.max(0, Math.min(b2_raw, BETA1));
-}
-
-function calcErrors(history, b0, b2) {
-  let sumSqErr = 0, sumAbsErr = 0, count = 0;
-  for (let i = 1; i < history.length; i++) {
-    const { patients, hi } = history[i];
-    const hiLag = history[i-1].hi;
-    if (hi !== null && hiLag !== null) {
-      const actual   = patients * SCALE_FACTOR;
-      const expected = Math.exp(b0 + BETA1 * hi + b2 * hiLag);
-      sumSqErr  += Math.pow(actual - expected, 2);
-      sumAbsErr += Math.abs(actual - expected);
-      count++;
-    }
-  }
-  if (count === 0) return { rmse: null, mae: null };
-  return { rmse: Math.sqrt(sumSqErr / count), mae: sumAbsErr / count };
-}
-
-function calcLambdaDaily(hi, hiLag, rh, wind, sun, rainDay, uv, b0, b2, pm25) {
+function calcLambdaDaily(hi, hiLag, wind, rainDay, pm25) {
   if (hi === null) return null;
-  const hiL  = hiLag  ?? hi;
-  const rhV  = rh     ?? 70;
-  const wV   = wind   ?? 5;
-  const sV   = sun    ?? 8;
-  const rV   = rainDay ?? 0;
-  const uvV  = uv     ?? 8;
-  const pmV  = pm25   ?? 25; 
 
-  const rhAdj   = Math.exp( 0.008  * (rhV - 70));
-  const windAdj = Math.exp(-0.015  * (wV  -  5));
-  const sunAdj  = Math.exp( 0.012  * (sV  -  8));
-  const rainAdj = Math.exp(-0.15   * rV);
-  const uvAdj   = Math.exp( 0.01   * (uvV -  6));
-  const pm25Adj = Math.exp( 0.005 * Math.max(0, pmV - 37.5));
-
-  const lnLambdaWeek = b0 + BETA1 * hi + b2 * hiL;
-  const lambdaWeek   = Math.exp(lnLambdaWeek) * rhAdj * windAdj * sunAdj * rainAdj * uvAdj * pm25Adj;
+  // --- พารามิเตอร์แบบ Hybrid ---
+  const intercept = -14.3268; // จากการเทรนพื้นที่ (NB2)
+  const coefHI    = 0.1484;   // อ้างอิง Phosri et al. (2019)
+  const coefHILag = 0.2450;   // จากการเทรนพื้นที่
+  const coefWind  = 0.1229;   // จากการเทรนพื้นที่ 
+  const coefRain  = -0.0662;  // จากการเทรนพื้นที่
+  const coefPM25  = 0.005;    // อ้างอิง WHO/AHA
   
+  // เตรียมค่าตัวแปร (ผสานธาตุทั้ง 4)
+  const hiV  = hi;
+  const hiL  = hiLag  ?? hi;
+  const wV   = wind   ?? 14; 
+  const rV   = rainDay ?? 0; 
+  const pmV  = pm25   ?? 25;
+
+  // สมการเชิงเส้นในรูป ln(λ)
+  const lnLambda = intercept + 
+                   (coefHI * hiV) + 
+                   (coefHILag * hiL) + 
+                   (coefWind * wV) + 
+                   (coefRain * rV) + 
+                   (coefPM25 * Math.max(0, pmV - 37.5));
+
+  // แปลงกลับเป็นค่า Lambda รายสัปดาห์ แล้วหาร 7 เป็นรายวัน
+  const lambdaWeek = Math.exp(lnLambda);
   return Math.max(0, lambdaWeek / 7);
 }
+
 // ═══════════════════════════════════════════════════════════
 // DATA FETCHING
 // ═══════════════════════════════════════════════════════════
@@ -724,7 +599,8 @@ async function main() {
   const weatherResults = await Promise.all(
     locEntries.map(([,coords]) => fetchWeather(coords[0], coords[1], startStr, endStr))
   );
-  setProgress(35, '⚙️ กำลัง fit โมเดล Poisson Regression...');
+  
+  setProgress(40, '⚙️ กำลังประมวลผลโมเดล Hybrid NB2...');
 
   const dailyAgg = {};
   const hourlyByProv = [];
@@ -766,67 +642,29 @@ async function main() {
       rh:   avg(ag.rh),
       wind: avg(ag.wind),
       sun:  avg(ag.sun),
-      rain: ag.precip.some(v=>v>0.5) ? 1 : 0,
+      rain: ag.precip.some(v=>v>0.5) ? 1 : 0, // สรุปเป็น Dummy (มีฝน=1) ให้ตรงกับตอนเทรน
       uv:   avg(ag.uv),
       isPast:    date < todayStr,
       isForecast: date >= todayStr
     };
   });
 
-  // ── [แก้ไข #2] Fit โมเดลจาก combined history (2568 + 2569) ──
-  const combinedHistory = buildCombinedHistory();
-  // [แก้ไข] สลับลำดับ: หา b2 ก่อน แล้วส่งเข้าไปเป็น Parameter ให้ b0
-  const b2 = fitBeta2(combinedHistory);
-  const { b0, fallback, validCount } = fitBeta0(combinedHistory, b2);
-  const errors = calcErrors(combinedHistory, b0, b2);
-
-  document.getElementById('b0-val').textContent = b0.toFixed(4);
-  document.getElementById('b2-val').textContent = b2.toFixed(4);
-  document.getElementById('kpi-beta0').textContent = b0.toFixed(3);
-  // สร้าง String สมการพร้อมตัวเลขจริง (ปรับทศนิยมให้ดูสวยงาม ไม่รกตา)
-  // หมายเหตุ: ตามหลักคณิตศาสตร์ Math.exp(A) * Math.exp(B) เท่ากับ ln(Y) = A + B 
+  // อัปเดต UI สมการตามค่า Hybrid NB2 ใหม่ล่าสุด
   const formulaStr = 
-    `ln(λ) = <span style="color:#ff3b3b">${b0.toFixed(3)}</span> ` +
+    `ln(λ) = <span style="color:#ff3b3b">-14.327</span> ` +
     `+ <span style="color:#00c8ff">0.148</span>(HI) ` +
-    `+ <span style="color:#00c8ff">${b2.toFixed(3)}</span>(HI_lag) <br>` +
-    `<span style="color: var(--muted); font-size: 12px;">` +
-    `+ 0.008(RH-70) - 0.015(Wind-5) + 0.012(Sun-8) - 0.15(Rain) + 0.01(UV-6) + 0.005(PM2.5-37.5)` +
-    `</span>`;
+    `+ <span style="color:#00c8ff">0.245</span>(HI_lag) ` +
+    `+ <span style="color:#00c8ff">0.123</span>(Wind) ` +
+    `- <span style="color:#00c8ff">0.066</span>(Rain) ` +
+    `+ <span style="color:#00c8ff">0.005</span>(PM2.5_adj)`;
     
   document.getElementById('formula-concrete').innerHTML = formulaStr;
-  
-  let errText = "-- / --";
-  if (fallback) {
-      errText = "2.145 / 1.350";
-      document.getElementById('error-val').parentElement.querySelector('.coef-desc').textContent = "ประเมินจากโมเดลฐานระดับประเทศ";
-  } else if (errors.rmse !== null) {
-      errText = `${errors.rmse.toFixed(3)} / ${errors.mae.toFixed(3)}`;
-      document.getElementById('error-val').parentElement.querySelector('.coef-desc').textContent =
-        `ประเมินจาก ${validCount} สัปดาห์ (2568–2569)`;
-  }
-  document.getElementById('error-val').textContent = errText;
-
-  if (fallback) {
-    const wb = document.getElementById('warn-banner');
-    wb.classList.add('visible');
-    document.getElementById('warn-text').textContent =
-      `ข้อมูล HI ประวัติไม่เพียงพอสำหรับ fitting (valid weeks: ${validCount}) — ใช้ β₀ fallback (-7.7743)`;
-  }
 
   const statusEl = document.getElementById('model-status');
-  const logoSrc = 'smart_sat_logo.png';
-
-  if (fallback) {
-    statusEl.innerHTML = `<img src="${logoSrc}" class="status-logo" alt="SAT Logo">`;
-    statusEl.style.borderColor = '#ff3b3b';
-    statusEl.style.color = '#ff3b3b';
-    statusEl.style.boxShadow = '0 0 12px rgba(255, 59, 59, 0.3)';
-  } else {
-    statusEl.innerHTML = `<img src="${logoSrc}" class="status-logo" alt="SAT Logo"> <span>MODEL FITTED (${validCount} wks)</span>`;
-    statusEl.style.borderColor = '#00ff88';
-    statusEl.style.color = '#00ff88';
-    statusEl.style.boxShadow = '0 0 12px rgba(0, 255, 136, 0.2)';
-  }
+  statusEl.innerHTML = `<span>HYBRID NB2 MODEL LOADED</span>`;
+  statusEl.style.borderColor = '#00ff88';
+  statusEl.style.color = '#00ff88';
+  statusEl.style.boxShadow = '0 0 12px rgba(0, 255, 136, 0.2)';
 
   setProgress(55, '🌫️ กำลังดึง PM2.5 จาก WAQI...');
 
@@ -842,9 +680,10 @@ async function main() {
 
   setProgress(75, '📊 กำลังคำนวณ λ และสร้างกราฟ...');
 
+  // คำนวณผู้ป่วยรายวันด้วยสมการ Hybrid ใหม่
   daily.forEach((d, i) => {
     const hiLag = i > 0 ? daily[i-1].hi : d.hi;
-    d.lambda = calcLambdaDaily(d.hi, hiLag, d.rh, d.wind, d.sun, d.rain, d.uv, b0, b2, pm25Avg);
+    d.lambda = calcLambdaDaily(d.hi, hiLag, d.wind, d.rain, pm25Avg);
   });
 
   const todayData = daily.find(d => d.date === todayStr) ?? daily[daily.length - 1];
@@ -935,12 +774,10 @@ async function main() {
     annotations:[{ x:nowISO, y:1, xref:'x', yref:'paper', text:'วันนี้', showarrow:false, font:{color:'#fff',size:10}, xanchor:'left' }]
   }, { responsive: true, displayModeBar: false });
 
-  // PLOT 2: Environmental variables
-  const pastDays  = daily.filter(d=>d.isPast);
-  const fcstDays  = daily.filter(d=>d.isForecast);
+  // PLOT 2: Environmental variables (ยังเก็บไว้แสดงกราฟได้ปกติ)
   const envTraces = [
     { name:'ความชื้น (%)', data: daily.map(d=>d.rh),   color:'#00c8ff', yaxis:'y1' },
-    { name:'ลม (km/h)',    data: daily.map(d=>d.wind),  color:'#34d399', yaxis:'y2' },
+    { name:'ลม (km/h)',    data: daily.map(d=>d.wind), color:'#34d399', yaxis:'y2' },
     { name:'แสงแดด (hr)', data: daily.map(d=>d.sun),   color:'#ffe04b', yaxis:'y2' },
     { name:'UV Index',    data: daily.map(d=>d.uv),    color:'#a78bfa', yaxis:'y2' },
   ].map(t => ({
@@ -1024,7 +861,7 @@ async function main() {
   const lambdaLine = {
     x: daily.map(d=>d.date),
     y: daily.map(d=>d.lambda),
-    type:'scatter', mode:'lines+markers', name:'Expected λ (Poisson)',
+    type:'scatter', mode:'lines+markers', name:'Expected λ (NB2)',
     line:{ color:'#00c8ff', width:2.5, shape:'spline' },
     marker:{ size:5 },
     hovertemplate:'%{x}<br>λ = %{y:.4f} ราย/วัน<extra>Expected</extra>'
