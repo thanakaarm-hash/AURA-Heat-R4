@@ -589,16 +589,22 @@ function buildCombinedHistory() {
   return combined;
 }
 
-function fitBeta0(history) {
-  // ใช้ข้อมูลรวมทั้งหมด (2568 + 2569) แทนการพึ่ง weekHI จาก API
+function fitBeta0(history, b2) {
   let sumY = 0, sumExp = 0, validCount = 0;
-  history.forEach(({ patients, hi }) => {
-    if (hi !== null && hi > 33 && patients > 0) {
+  
+  // เริ่มที่ i = 1 เพราะเราต้องใช้ประวัติของสัปดาห์ก่อนหน้า (hiLag)
+  for (let i = 1; i < history.length; i++) {
+    const { patients, hi } = history[i];
+    const hiLag = history[i-1].hi;
+
+    if (hi !== null && hiLag !== null && hi > 33 && patients > 0) {
       sumY   += patients * SCALE_FACTOR;
-      sumExp += Math.exp(BETA1 * hi);
+      // [แก้ไข] รวม b2 * hiLag เข้าไปใน exponent เพื่อให้ b0 หักลบค่านี้ออกไปแต่แรก
+      sumExp += Math.exp(BETA1 * hi + b2 * hiLag);
       validCount++;
     }
-  });
+  }
+
   if (sumY <= 0 || sumExp <= 0 || validCount < 3) {
     return { b0: -7.7743, fallback: true, validCount };
   }
@@ -643,7 +649,7 @@ function calcErrors(history, b0, b2) {
   return { rmse: Math.sqrt(sumSqErr / count), mae: sumAbsErr / count };
 }
 
-function calcLambdaDaily(hi, hiLag, rh, wind, sun, rainDay, uv, b0, b2) {
+function calcLambdaDaily(hi, hiLag, rh, wind, sun, rainDay, uv, b0, b2, pm25) {
   if (hi === null) return null;
   const hiL  = hiLag  ?? hi;
   const rhV  = rh     ?? 70;
@@ -651,18 +657,20 @@ function calcLambdaDaily(hi, hiLag, rh, wind, sun, rainDay, uv, b0, b2) {
   const sV   = sun    ?? 8;
   const rV   = rainDay ?? 0;
   const uvV  = uv     ?? 8;
+  const pmV  = pm25   ?? 25; 
 
   const rhAdj   = Math.exp( 0.008  * (rhV - 70));
   const windAdj = Math.exp(-0.015  * (wV  -  5));
   const sunAdj  = Math.exp( 0.012  * (sV  -  8));
   const rainAdj = Math.exp(-0.15   * rV);
   const uvAdj   = Math.exp( 0.01   * (uvV -  6));
+  const pm25Adj = Math.exp( 0.005 * Math.max(0, pmV - 37.5));
 
   const lnLambdaWeek = b0 + BETA1 * hi + b2 * hiL;
-  const lambdaWeek   = Math.exp(lnLambdaWeek) * rhAdj * windAdj * sunAdj * rainAdj * uvAdj;
+  const lambdaWeek   = Math.exp(lnLambdaWeek) * rhAdj * windAdj * sunAdj * rainAdj * uvAdj * pm25Adj;
+  
   return Math.max(0, lambdaWeek / 7);
 }
-
 // ═══════════════════════════════════════════════════════════
 // DATA FETCHING
 // ═══════════════════════════════════════════════════════════
@@ -756,8 +764,9 @@ async function main() {
 
   // ── [แก้ไข #2] Fit โมเดลจาก combined history (2568 + 2569) ──
   const combinedHistory = buildCombinedHistory();
-  const { b0, fallback, validCount } = fitBeta0(combinedHistory);
+  // [แก้ไข] สลับลำดับ: หา b2 ก่อน แล้วส่งเข้าไปเป็น Parameter ให้ b0
   const b2 = fitBeta2(combinedHistory);
+  const { b0, fallback, validCount } = fitBeta0(combinedHistory, b2);
   const errors = calcErrors(combinedHistory, b0, b2);
 
   document.getElementById('b0-val').textContent = b0.toFixed(4);
@@ -813,7 +822,7 @@ async function main() {
 
   daily.forEach((d, i) => {
     const hiLag = i > 0 ? daily[i-1].hi : d.hi;
-    d.lambda = calcLambdaDaily(d.hi, hiLag, d.rh, d.wind, d.sun, d.rain, d.uv, b0, b2);
+    d.lambda = calcLambdaDaily(d.hi, hiLag, d.rh, d.wind, d.sun, d.rain, d.uv, b0, b2, pm25Avg);
   });
 
   const todayData = daily.find(d => d.date === todayStr) ?? daily[daily.length - 1];
