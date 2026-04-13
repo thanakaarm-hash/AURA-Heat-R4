@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AURA Heat R4 · ระบบเฝ้าระวังความร้อน เขตสุขภาพที่ 4</title>
+<title>AURA Heat R4 · ระบบเฝ้าระวังความร้อน เขตสุขภาพที่ 4 (National Proxy)</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -35,201 +35,86 @@
     overflow-x: hidden;
   }
 
-  /* ── Scanline overlay ── */
   body::before {
-    content: '';
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background: repeating-linear-gradient(
-      0deg, transparent, transparent 2px,
-      rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px
-    );
+    content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px);
   }
 
-  /* ── Header ── */
   header {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(10,12,16,.92);
-    backdrop-filter: blur(12px);
+    background: rgba(10,12,16,.92); backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
-    padding: 12px 32px;
-    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 32px; display: flex; align-items: center; justify-content: space-between;
   }
   .logo { display: flex; align-items: center; gap: 12px; }
   .logo-icon {
-    width: 38px; height: 38px;
-    background: linear-gradient(135deg, var(--accent), #ff2d00);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px; background: linear-gradient(135deg, var(--accent), #ff2d00);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
     font-size: 20px; box-shadow: 0 0 16px rgba(255,107,26,.4);
   }
   .logo-text { font-size: 13px; line-height: 1.3; }
   .logo-text strong { display: block; font-size: 18px; letter-spacing: 4px; color: var(--accent); font-family: var(--mono); }
   .header-right { display: flex; gap: 20px; align-items: center; }
   .badge {
-    font-family: var(--mono); font-size: 11px;
-    padding: 3px 10px; border-radius: 4px;
+    font-family: var(--mono); font-size: 11px; padding: 3px 10px; border-radius: 4px;
     border: 1px solid var(--border); color: var(--muted);
   }
   #model-status {
-    font-family: var(--mono); font-size: 11px;
-    padding: 4px 12px; border-radius: 6px;
-    border: 1px solid var(--accent2);
-    color: var(--accent2);
-    background: rgba(0, 0, 0, 0.85);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    font-family: var(--mono); font-size: 11px; padding: 4px 12px; border-radius: 6px;
+    border: 1px solid var(--accent2); color: var(--accent2); background: rgba(0, 0, 0, 0.85);
+    display: flex; align-items: center; gap: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.5);
   }
 
-  .status-logo {
-    height: 60px;
-    width: auto;
-    animation: flashAlert 1.8s infinite alternate;
-  }
-
-  @keyframes flashAlert {
-    0% { opacity: 1; filter: drop-shadow(0 0 4px currentColor); }
-    100% { opacity: 0.3; filter: drop-shadow(0 0 0 transparent); }
-  }
-
-  /* ── Main layout ── */
   main { position: relative; z-index: 1; padding: 24px 32px 60px; max-width: 1600px; margin: 0 auto; }
 
-  /* ── Section title ── */
-  .section-label {
-    font-family: var(--mono); font-size: 11px; letter-spacing: 3px;
-    color: var(--muted); text-transform: uppercase; margin-bottom: 6px;
-  }
-  .section-title {
-    font-size: 20px; font-weight: 700; color: var(--text);
-    margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
-  }
-  .section-title::after {
-    content: ''; flex: 1; height: 1px;
-    background: linear-gradient(90deg, var(--border), transparent);
-  }
+  .section-label { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .section-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
 
-  /* ── KPI Cards ── */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px; margin-bottom: 32px;
-  }
-  .kpi-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px; padding: 18px 20px;
-    position: relative; overflow: hidden;
-    transition: border-color .2s, transform .2s;
-  }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; position: relative; overflow: hidden; transition: border-color .2s, transform .2s; }
   .kpi-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .kpi-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--accent), transparent);
-  }
+  .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), transparent); }
   .kpi-card.blue::before  { background: linear-gradient(90deg, var(--accent2), transparent); }
   .kpi-card.yellow::before { background: linear-gradient(90deg, var(--accent3), transparent); }
-  .kpi-card.red::before   { background: linear-gradient(90deg, var(--danger), transparent); }
+  .kpi-card.purple::before { background: linear-gradient(90deg, #a78bfa, transparent); }
   .kpi-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-bottom: 6px; }
   .kpi-value { font-family: var(--mono); font-size: 32px; font-weight: 700; color: var(--accent); }
   .kpi-card.blue  .kpi-value { color: var(--accent2); }
   .kpi-card.yellow .kpi-value { color: var(--accent3); }
-  .kpi-card.red   .kpi-value { color: var(--danger); }
+  .kpi-card.purple .kpi-value { color: #a78bfa; }
   .kpi-unit { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
-  /* ── Chart containers ── */
-  .chart-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px; padding: 20px;
-    margin-bottom: 24px; position: relative;
-  }
-  .chart-header {
-    display: flex; align-items: flex-start;
-    justify-content: space-between; margin-bottom: 16px; gap: 16px;
-  }
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 24px; position: relative; }
+  .chart-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; gap: 16px; }
   .chart-title { font-size: 15px; font-weight: 600; color: var(--text); }
   .chart-subtitle { font-size: 12px; color: var(--muted); margin-top: 3px; }
   .chart-plot { width: 100%; height: 360px; }
   .chart-plot.tall { height: 440px; }
 
-  /* ── Model info panel ── */
-  .model-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px; padding: 24px;
-    margin-bottom: 24px;
-  }
-  .coef-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px; margin-top: 16px;
-  }
-  .coef-card {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px 16px;
-  }
+  .model-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+  .coef-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px; }
+  .coef-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
   .coef-name { font-size: 11px; color: var(--muted); font-family: var(--mono); }
   .coef-val  { font-family: var(--mono); font-size: 18px; color: var(--accent2); margin-top: 4px; }
   .coef-desc { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
-  /* ── Formula box ── */
-  .formula {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent2);
-    border-radius: 6px; padding: 14px 18px;
-    font-family: var(--mono); font-size: 13px;
-    color: var(--accent2); margin: 16px 0;
-    overflow-x: auto; white-space: nowrap;
-  }
+  .formula { background: var(--bg); border: 1px solid var(--border); border-left: 3px solid var(--accent2); border-radius: 6px; padding: 14px 18px; font-family: var(--mono); font-size: 13px; color: var(--accent2); margin: 16px 0; overflow-x: auto; white-space: nowrap; }
 
-  /* ── Loading overlay ── */
-  #loading-overlay {
-    position: fixed; inset: 0; z-index: 999;
-    background: var(--bg);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 20px;
-  }
+  #loading-overlay { position: fixed; inset: 0; z-index: 999; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
   .loading-icon { font-size: 48px; animation: spin 2s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text { font-family: var(--mono); color: var(--accent2); font-size: 14px; }
   .loading-steps { font-size: 12px; color: var(--muted); text-align: center; line-height: 2; }
-  .progress-bar {
-    width: 300px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent));
-    width: 0%; transition: width .4s ease; border-radius: 2px;
-  }
+  .progress-bar { width: 300px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); width: 0%; transition: width .4s ease; border-radius: 2px; }
 
-  /* ── Footnote ── */
-  .footnote {
-    font-size: 11px; color: var(--muted); line-height: 1.7;
-    border-top: 1px solid var(--border); padding-top: 20px; margin-top: 40px;
-  }
+  .footnote { font-size: 11px; color: var(--muted); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 40px; }
   .footnote strong { color: var(--text); }
 
-  /* ── กรมอนามัย Table ── */
-  .health-table-wrap {
-      overflow-x: auto;
-      margin-top: 20px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-  }
-  .health-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-  }
-  .health-table th, .health-table td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      border-right: 1px solid var(--border);
-  }
+  .health-table-wrap { overflow-x: auto; margin-top: 20px; border-radius: 8px; border: 1px solid var(--border); }
+  .health-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .health-table th, .health-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
   .health-table th { background: #222; color: #fff; text-align: center;}
   .health-table td:last-child, .health-table th:last-child { border-right: none;}
   .health-table tr:last-child td { border-bottom: none;}
@@ -239,25 +124,9 @@
   .lv-danger { background-color: #ff8c00; color: #000; font-weight: bold; text-align: center;}
   .lv-critical { background-color: #ff3b3b; color: #000; font-weight: bold; text-align: center;}
 
-  /* ── Leaflet Map Overrides ── */
-  #map-container {
-      width: 100%;
-      height: 400px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      z-index: 10;
-  }
-  .leaflet-popup-content-wrapper {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-  }
-  .leaflet-popup-tip {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      border-left: 1px solid var(--border);
-  }
+  #map-container { width: 100%; height: 400px; border-radius: 12px; border: 1px solid var(--border); z-index: 10; }
+  .leaflet-popup-content-wrapper { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
+  .leaflet-popup-tip { background: var(--surface); border-top: 1px solid var(--border); border-left: 1px solid var(--border); }
   .map-popup-title { font-weight: bold; color: var(--accent2); margin-bottom: 5px;}
   .map-popup-text { font-size: 12px; margin-bottom: 3px;}
 
@@ -287,11 +156,11 @@
     <div class="logo-icon">🔥</div>
     <div class="logo-text">
       <strong>AURA HEAT R4</strong>
-      ระบบเฝ้าระวังความร้อน · เขตสุขภาพที่ 4
+      ระบบเฝ้าระวังความร้อน · เขตสุขภาพที่ 4 (พร้อมตัวแทนสเกลประเทศ)
     </div>
   </div>
   <div class="header-right">
-    <span class="badge">8 จังหวัด · ประชากร ~5 ล้านคน</span>
+    <span class="badge">เขต 4 ประชากร 5.4M / ประเทศ 65.8M</span>
     <span id="model-status">⬤ LOADING MODEL...</span>
   </div>
 </header>
@@ -302,7 +171,7 @@
     <div class="kpi-card">
       <div class="kpi-label">HEAT INDEX วันนี้ (เฉลี่ยเขต 4)</div>
       <div class="kpi-value" id="kpi-hi">--</div>
-      <div class="kpi-unit">°C (apparent temperature max)</div>
+      <div class="kpi-unit">°C (ใช้เป็น Proxy ระดับประเทศ)</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-label">PM2.5 วันนี้ (เฉลี่ยเขต 4)</div>
@@ -310,30 +179,31 @@
       <div class="kpi-unit">µg/m³</div>
     </div>
     <div class="kpi-card yellow">
-      <div class="kpi-label">λ คาดการณ์วันนี้ (เขต 4)</div>
-      <div class="kpi-value" id="kpi-lambda">--</div>
-      <div class="kpi-unit">ราย/วัน (NB2 Expected)</div>
+      <div class="kpi-label">λ คาดการณ์วันนี้ (เฉพาะเขต 4)</div>
+      <div class="kpi-value" id="kpi-lambda-r4">--</div>
+      <div class="kpi-unit">ราย/วัน (สัดส่วน 8.27%)</div>
     </div>
-    <div class="kpi-card red">
-      <div class="kpi-label">β₀ (Intercept)</div>
-      <div class="kpi-value" id="kpi-beta0">-14.327</div>
-      <div class="kpi-unit">จาก Local NB2 Model</div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">λ คาดการณ์วันนี้ (ทั้งประเทศ)</div>
+      <div class="kpi-value" id="kpi-lambda-nat">--</div>
+      <div class="kpi-unit">ราย/วัน (รวม 77 จังหวัด)</div>
     </div>
   </div>
 
   <div class="section-label">GEOGRAPHIC DISTRIBUTION</div>
-  <div class="section-title">📍 แผนที่เฝ้าระวังความร้อน 8 จังหวัด (วันนี้)</div>
+  <div class="section-title">📍 แผนที่เฝ้าระวังความร้อน 8 จังหวัด เขต 4 (Regional Focus)</div>
   <div class="chart-wrap">
       <div id="map-container"></div>
   </div>
 
   <div class="model-panel">
     <div class="section-label">MODEL SPECIFICATION</div>
-    <div class="section-title">สมการ Negative Binomial Regression (Hybrid)</div>
+    <div class="section-title">สมการ Negative Binomial Regression (Hybrid Proxy Model)</div>
     
     <div class="formula" id="formula-display">
       <div style="color: var(--muted); font-size: 11px; margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 8px;">
-        ln(λ_t) = β₀ + β₁·HI_t + β₂·HI_(t-1) + β₃·Wind_t + β₄·Rain_t + β₅·PM2.5_t
+        ln(λ_national) = β₀ + β₁·HI_t + β₂·HI_(t-1) + β₃·Wind_t + β₄·Rain_t + β₅·PM2.5_t<br>
+        λ_region4 = λ_national × (ประชากรเขต 4 / ประชากรประเทศ)
       </div>
       <div id="formula-concrete" style="line-height: 1.8;">
         <span style="color: var(--muted);">กำลังโหลดพารามิเตอร์ของโมเดล...</span>
@@ -341,15 +211,15 @@
     </div>
 
     <div style="font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: -6px; margin-bottom: 20px; padding-left: 4px; font-family: var(--sans);">
-      <span style="color: var(--accent2); font-family: var(--mono);">[β₁] อ้างอิง Heat Index:</span> Phosri S. et al. (2019). EnvironmentAsia. (RR = 1.16/°C)<br>
-      <span style="color: var(--accent2); font-family: var(--mono);">[β₅] อ้างอิง PM2.5 (Synergistic Factor):</span> WHO Global Air Quality Guidelines (2021)<br>
-      <span style="color: var(--accent3); font-family: var(--mono);">[β₀, β₂, β₃, β₄] Local Calibration:</span> พารามิเตอร์จากการเทรนด้วยข้อมูลจริงเขตสุขภาพที่ 4 (Negative Binomial NB2, 2026)
+      <span style="color: var(--accent2); font-family: var(--mono);">[Context:]</span> ใช้สภาพอากาศของภาคกลาง (เขต 4) เป็นตัวแทน (Proxy) ของแนวโน้มคลื่นความร้อนระดับประเทศ เนื่องจากลักษณะการปกคลุมของมวลอากาศร้อนในฤดูร้อน<br>
+      <span style="color: var(--accent3); font-family: var(--mono);">[β₀, β₂, β₃, β₄] Local Calibration:</span> พารามิเตอร์จากการเทรนด้วยข้อมูลจริงระดับประเทศ (Negative Binomial NB2, 2026)
     </div>
+    
     <div class="coef-grid" id="coef-grid">
       <div class="coef-card">
         <div class="coef-name">β₀ (intercept)</div>
         <div class="coef-val" id="b0-val">-14.3268</div>
-        <div class="coef-desc">Fitted จาก Local NB2</div>
+        <div class="coef-desc">Fitted จากยอดป่วยทั้งประเทศ</div>
       </div>
       <div class="coef-card">
         <div class="coef-name">β₁ (HI_t)</div>
@@ -359,12 +229,12 @@
       <div class="coef-card">
         <div class="coef-name">β₂ (HI_lag)</div>
         <div class="coef-val" id="b2-val">0.2450</div>
-        <div class="coef-desc">ผลความร้อนสะสมสัปดาห์ก่อน (NB2)</div>
+        <div class="coef-desc">ความร้อนสะสมสัปดาห์ก่อน</div>
       </div>
       <div class="coef-card" style="border-color: var(--accent3);">
         <div class="coef-name" style="color: var(--accent3);">Model Error (RMSE / MAE)</div>
         <div class="coef-val" id="error-val" style="color: var(--accent3);">0.562 / 0.353</div>
-        <div class="coef-desc">ราย/วัน (จากข้อมูลเทรน 66 สัปดาห์)</div>
+        <div class="coef-desc">ราย/วัน (Fitted by NB2)</div>
       </div>
     </div>
   </div>
@@ -374,77 +244,31 @@
   <div class="chart-wrap">
     <div class="chart-header">
       <div>
-        <div class="chart-title">Apparent Temperature · 8 จังหวัด เขตสุขภาพที่ 4</div>
+        <div class="chart-title">Apparent Temperature · 8 จังหวัด เขตสุขภาพที่ 4 (National Proxy)</div>
         <div class="chart-subtitle">เส้นสีแดงประ = เกณฑ์เฝ้าระวัง 40°C | เส้นขาว = วันนี้</div>
       </div>
     </div>
     <div id="plot-heat" class="chart-plot tall"></div>
-    
-    <div class="health-table-wrap">
-        <table class="health-table">
-            <thead>
-                <tr>
-                    <th width="15%">ระดับ</th>
-                    <th width="20%">ดัชนีความร้อน (°C)</th>
-                    <th width="65%">ผลกระทบต่อสุขภาพ (อ้างอิงกรมอนามัย)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="lv-watch">เฝ้าระวัง</td>
-                    <td class="lv-watch">27.0 - 32.9</td>
-                    <td>เมื่อสัมผัสความร้อน และทำกิจกรรมกลางแจ้งเป็นเวลานาน อาจทำให้ร่างกายเกิดอาการเบื้องต้น เช่น อ่อนเพลีย ปวดศีรษะ ผื่นจากความร้อน บวมจากความร้อน ปวดเมื่อยตามร่างกาย นำไปสู่การเกิดตะคริวจากความร้อนได้</td>
-                </tr>
-                <tr>
-                    <td class="lv-warn">เตือนภัย</td>
-                    <td class="lv-warn">33.0 - 41.9</td>
-                    <td>เมื่อสัมผัสความร้อน และทำกิจกรรมกลางแจ้งเป็นเวลานาน อาจมีความเสี่ยงที่จะเกิดโรคเพลียแดด (Heat exhaustion) และเป็นตะคริวจากความร้อนได้ และอาจส่งผลให้เกิดโรคลมร้อน หรือ ฮีทสโตรก (Heat stroke)</td>
-                </tr>
-                <tr>
-                    <td class="lv-danger">อันตราย</td>
-                    <td class="lv-danger">42.0 - 51.9</td>
-                    <td>เมื่อสัมผัสความร้อน และทำกิจกรรมกลางแจ้งเป็นเวลานาน อาจทำให้เป็นตะคริวจากความร้อน และเกิดโรคเพลียแดดจากความร้อน (Heat exhaustion) และเพิ่มความเสี่ยงต่อการเกิดโรคลมร้อน หรือ ฮีทสโตรก (Heat stroke) ได้ หากสัมผัสความร้อนอย่างต่อเนื่อง</td>
-                </tr>
-                <tr>
-                    <td class="lv-critical">อันตรายมาก</td>
-                    <td class="lv-critical">>= 52.0</td>
-                    <td style="background-color: #331111;">เมื่อสัมผัสความร้อน และทำกิจกรรมกลางแจ้งเป็นเวลานานอย่างต่อเนื่อง มีความ<span style="text-decoration: underline;">เสี่ยงสูงมาก</span>ที่เกิดโรคลมร้อน หรือ ฮีทสโตรก (Heat stroke)</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
   </div>
 
-  <div class="section-title">📊 ตัวแปรสิ่งแวดล้อม (รายวัน เฉลี่ย 8 จังหวัด)</div>
-  <div class="chart-wrap">
-    <div class="chart-header">
-      <div>
-        <div class="chart-title">RH · ลม · แดด · ฝน · UV</div>
-        <div class="chart-subtitle">ข้อมูลจาก Open-Meteo | 7 วันย้อนหลัง + 7 วันพยากรณ์</div>
+  <div class="section-title">📊 ตัวแปรสิ่งแวดล้อมอื่น (รายวัน) และ 🌫️ ดัชนี PM2.5 จาก WAQI</div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+      <div class="chart-wrap" style="margin-bottom: 0;">
+        <div id="plot-env" class="chart-plot" style="height: 300px;"></div>
       </div>
-    </div>
-    <div id="plot-env" class="chart-plot"></div>
-  </div>
-
-  <div class="section-title">🌫️ PM2.5 จาก WAQI (เขต 4)</div>
-  <div class="chart-wrap">
-    <div class="chart-header">
-      <div>
-        <div class="chart-title">ดัชนี PM2.5 รายวัน (เฉลี่ยสถานีในเขต 4)</div>
-        <div class="chart-subtitle">แหล่งข้อมูล: World Air Quality Index (WAQI) · กรมควบคุมมลพิษ</div>
+      <div class="chart-wrap" style="margin-bottom: 0;">
+        <div id="plot-pm25" class="chart-plot" style="height: 300px;"></div>
       </div>
-    </div>
-    <div id="plot-pm25" class="chart-plot"></div>
   </div>
 
-  <div class="section-label">PATIENT FORECAST</div>
-  <div class="section-title">🏥 คาดการณ์ผู้ป่วยโรคจากความร้อน (เขต 4 รวม 8 จังหวัด)</div>
+  <div class="section-label">PATIENT FORECAST (MACRO & MICRO LEVEL)</div>
+  <div class="section-title">🏥 คาดการณ์ผู้ป่วยโรคจากความร้อน (เขต 4 ซ้อนทับระดับประเทศ)</div>
   <div class="chart-wrap">
     <div class="chart-header">
       <div>
-        <div class="chart-title">Hybrid NB2 Regression Model</div>
+        <div class="chart-title">Stacked Bar: Hybrid NB2 Regression Model</div>
         <div class="chart-subtitle">
-          ประชากรอ้างอิง 5 ล้านคน (7.58% ของประเทศ) · ปรับแก้ฐานผู้ป่วยระดับเขตแล้ว
+          แสดงสัดส่วนผู้ป่วยในเขต 4 (สีส้ม/เหลืองเข้ม) เทียบกับภูมิภาคอื่นๆ ทั่วประเทศ (สีจาง) เพื่อให้เห็นภาพรวมของประเทศบนฐานข้อมูลอากาศภาคกลาง
         </div>
       </div>
     </div>
@@ -453,18 +277,19 @@
 
  <div class="footnote">
     <strong>แหล่งข้อมูล:</strong>
-    Open-Meteo API (อุตุนิยมวิทยา) ·
     World Air Quality Index / WAQI (PM2.5) ·
     DDS กรมควบคุมโรค (ข้อมูลผู้ป่วยระดับประเทศ ปี 2568–2569) <br>
     
     <strong>พยากรณ์อากาศ:</strong>
-    ข้อมูลพยากรณ์สภาพอากาศล่วงหน้า 7 วัน (Weather Forecast) ดึงผ่าน Open-Meteo API ซึ่งประมวลผลจากแบบจำลองอุตุนิยมวิทยาระดับโลก (อาทิ ECMWF, GFS, ICON)<br>
+    ข้อมูลพยากรณ์สภาพอากาศล่วงหน้า 7 วัน (Weather Forecast) ดึงผ่าน Open-Meteo API ซึ่งประมวลผลจากแบบจำลองอุตุนิยมวิทยาระดับโลก (อาทิ ECMWF, GFS, ICON) โดยใช้พิกัดของเขตสุขภาพที่ 4 เป็นตัวแทนระดับภูมิภาคตอนกลาง<br>
 
     <strong>พารามิเตอร์ Hybrid:</strong>
-    ใช้สัมประสิทธิ์ความเสี่ยงจากงานวิจัย (Phosri et al. 2019, WHO 2021) ผสานกับน้ำหนักตัวแปรจากการเทรนโมเดล Negative Binomial Regression (NB2) ด้วยข้อมูลจริงของเขตสุขภาพที่ 4 (HI_lag, Wind, Rain) <br>
+    ใช้สัมประสิทธิ์ความเสี่ยงจากงานวิจัย (Phosri et al. 2019, WHO 2021) ผสานกับน้ำหนักตัวแปรจากการเทรนโมเดล Negative Binomial Regression (NB2) ด้วยข้อมูลจริงระดับประเทศเทียบกับสภาพอากาศเขต 4 (HI_lag, Wind, Rain) <br>
+    
     <strong>ข้อจำกัด:</strong>
-    ตัวเลขผู้ป่วยเป็นค่าคาดหมาย (Expected λ) ไม่ใช่จำนวนผู้ป่วยจริง · ใช้เพื่อประเมินแนวโน้มและสื่อสารความเสี่ยง ไม่ใช่การวินิจฉัยทางคลินิก <br>
-    <strong>เวอร์ชัน:</strong> AURA HEAT R4 v3.1 (Hybrid NB2) · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้าเว็บ
+    ตัวเลขผู้ป่วยเป็นค่าคาดหมาย (Expected λ) ทอนสัดส่วนตามประชากรเขต 4 ประกาศ ปค. สิ้นปี 2568 ไม่ใช่จำนวนผู้ป่วยจริง · ใช้สภาพอากาศเขต 4 เป็น Proxy ของประเทศ อาจมีความคลาดเคลื่อนในวันที่ภาคอื่นมีสภาพอากาศต่างไปอย่างสุดขั้ว · ใช้เพื่อประเมินแนวโน้ม ไม่ใช่การวินิจฉัยทางคลินิก <br>
+    
+    <strong>เวอร์ชัน:</strong> AURA HEAT R4 v3.2 (Macro-Micro Stacked NB2) · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้าเว็บ
     
     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border); text-align: center; line-height: 1.8; color: var(--muted); font-size: 12px; font-family: var(--sans);">
       &copy; 2026 Office of Disease Prevention and Control 4 (ODPC 4), Saraburi. All rights reserved.<br>
@@ -479,9 +304,12 @@
 // CONSTANTS & HYBRID PARAMETERS
 // ═══════════════════════════════════════════════════════════
 const WAQI_TOKEN   = 'd128f19a81ec49b868126c970ca3c6ab501c8b52';
-const POP_NOTE     = 'ประชากรเขต 4 ≈ 5 ล้านคน (7.58% ของประเทศ)';
 
-// ข้อมูลพิกัด 8 จังหวัด เขต 4
+// อัปเดตข้อมูลประชากร อ้างอิงประกาศกรมการปกครอง สิ้นปี 2568
+const POP_NATIONAL = 65809011; 
+const POP_REGION4  = 5448024;  
+const SCALE_FACTOR = POP_REGION4 / POP_NATIONAL; // ≈ 0.08278 (8.27% ของประเทศ)
+
 const LOCATIONS = {
   'นนทบุรี':    [13.8591, 100.5217],
   'ปทุมธานี':   [14.0208, 100.5250],
@@ -494,8 +322,8 @@ const LOCATIONS = {
 };
 
 const PROV_POP_RATIO = {
-    'นนทบุรี': 0.25, 'ปทุมธานี': 0.23, 'อยุธยา': 0.16, 'สระบุรี': 0.13,
-    'ลพบุรี': 0.15, 'สิงห์บุรี': 0.04, 'อ่างทอง': 0.05, 'นครนายก': 0.05
+    'นนทบุรี': 0.240, 'ปทุมธานี': 0.225, 'อยุธยา': 0.150, 'ลพบุรี': 0.134,
+    'สระบุรี': 0.117, 'อ่างทอง': 0.050, 'นครนายก': 0.048, 'สิงห์บุรี': 0.036
 };
 
 const WAQI_STATIONS = [
@@ -517,38 +345,25 @@ function fmtDate(d) { return d.toISOString().split('T')[0]; }
 function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
 function avg(arr)   { return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null; }
 
-function mulberry32(seed) {
-  return function() {
-    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
-    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
-    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
-}
-function dateToSeed(s) { return parseInt(s.replace(/-/g,''), 10); }
-
 // ═══════════════════════════════════════════════════════════
-// THE HYBRID NB2 MODEL
+// THE HYBRID NB2 MODEL (Dual Scale)
 // ═══════════════════════════════════════════════════════════
 function calcLambdaDaily(hi, hiLag, wind, rainDay, pm25) {
-  if (hi === null) return null;
+  if (hi === null) return { national: null, region4: null };
 
-  // --- พารามิเตอร์แบบ Hybrid ---
-  const intercept = -14.3268; // จากการเทรนพื้นที่ (NB2)
-  const coefHI    = 0.1484;   // อ้างอิง Phosri et al. (2019)
-  const coefHILag = 0.2450;   // จากการเทรนพื้นที่
-  const coefWind  = 0.1229;   // จากการเทรนพื้นที่ 
-  const coefRain  = -0.0662;  // จากการเทรนพื้นที่
-  const coefPM25  = 0.005;    // อ้างอิง WHO/AHA
+  const intercept = -14.3268; 
+  const coefHI    = 0.1484;   
+  const coefHILag = 0.2450;   
+  const coefWind  = 0.1229;   
+  const coefRain  = -0.0662;  
+  const coefPM25  = 0.005;    
   
-  // เตรียมค่าตัวแปร (ผสานธาตุทั้ง 4)
   const hiV  = hi;
   const hiL  = hiLag  ?? hi;
   const wV   = wind   ?? 14; 
   const rV   = rainDay ?? 0; 
   const pmV  = pm25   ?? 25;
 
-  // สมการเชิงเส้นในรูป ln(λ)
   const lnLambda = intercept + 
                    (coefHI * hiV) + 
                    (coefHILag * hiL) + 
@@ -556,53 +371,46 @@ function calcLambdaDaily(hi, hiLag, wind, rainDay, pm25) {
                    (coefRain * rV) + 
                    (coefPM25 * Math.max(0, pmV - 37.5));
 
-  // แปลงกลับเป็นค่า Lambda รายสัปดาห์ แล้วหาร 7 เป็นรายวัน
-  const lambdaWeek = Math.exp(lnLambda);
-  return Math.max(0, lambdaWeek / 7);
+  // ค่าระดับประเทศ (National)
+  const lambdaWeekNational = Math.exp(lnLambda);
+  
+  // ค่าระดับเขต 4 (ทอนสัดส่วน 8.27%)
+  const lambdaWeekRegion4 = lambdaWeekNational * SCALE_FACTOR;
+
+  return {
+      national: Math.max(0, lambdaWeekNational / 7),
+      region4:  Math.max(0, lambdaWeekRegion4 / 7)
+  };
 }
 
 // ═══════════════════════════════════════════════════════════
-// DATA FETCHING
+// DATA FETCHING & MAIN
 // ═══════════════════════════════════════════════════════════
 async function fetchWeather(lat, lon, startDate, endDate) {
-  const url = `https://api.open-meteo.com/v1/forecast`
-    + `?latitude=${lat}&longitude=${lon}`
-    + `&hourly=apparent_temperature`
-    + `&daily=apparent_temperature_max,relative_humidity_2m_mean,`
-    + `wind_speed_10m_max,sunshine_duration,precipitation_sum,uv_index_max`
-    + `&start_date=${startDate}&end_date=${endDate}`
-    + `&timezone=Asia%2FBangkok`;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=apparent_temperature&daily=apparent_temperature_max,relative_humidity_2m_mean,wind_speed_10m_max,sunshine_duration,precipitation_sum,uv_index_max&start_date=${startDate}&end_date=${endDate}&timezone=Asia%2FBangkok`;
   const r = await fetch(url);
   return r.json();
 }
 
 async function fetchWAQI(stationQuery) {
-  const url = `https://api.waqi.info/feed/${stationQuery}/?token=${WAQI_TOKEN}`;
   try {
-    const r = await fetch(url);
+    const r = await fetch(`https://api.waqi.info/feed/${stationQuery}/?token=${WAQI_TOKEN}`);
     const d = await r.json();
     if (d.status === 'ok') return d.data;
     return null;
   } catch { return null; }
 }
 
-// ═══════════════════════════════════════════════════════════
-// MAIN
-// ═══════════════════════════════════════════════════════════
 async function main() {
   const today    = new Date(); today.setHours(0,0,0,0);
-  const pastDate = addDays(today, -8);
-  const futDate  = addDays(today,  7);
-  const startStr = fmtDate(pastDate);
-  const endStr   = fmtDate(futDate);
+  const startStr = fmtDate(addDays(today, -8));
+  const endStr   = fmtDate(addDays(today,  7));
   const todayStr = fmtDate(today);
 
   setProgress(5, '⏳ กำลังดึงข้อมูลอุตุนิยมวิทยา 8 จังหวัด...');
 
   const locEntries = Object.entries(LOCATIONS);
-  const weatherResults = await Promise.all(
-    locEntries.map(([,coords]) => fetchWeather(coords[0], coords[1], startStr, endStr))
-  );
+  const weatherResults = await Promise.all(locEntries.map(([,coords]) => fetchWeather(coords[0], coords[1], startStr, endStr)));
   
   setProgress(40, '⚙️ กำลังประมวลผลโมเดล Hybrid NB2...');
 
@@ -613,12 +421,7 @@ async function main() {
   weatherResults.forEach((data, pi) => {
     const prov = locEntries[pi][0];
     dailyByProv[prov] = { todayHi: null, todayLambda: null };
-
-    hourlyByProv.push({
-      name: prov,
-      times: data.hourly.time,
-      temps: data.hourly.apparent_temperature
-    });
+    hourlyByProv.push({ name: prov, times: data.hourly.time, temps: data.hourly.apparent_temperature });
 
     data.daily.time.forEach((date, i) => {
       if (!dailyAgg[date]) dailyAgg[date] = { hi:[], rh:[], wind:[], sun:[], precip:[], uv:[] };
@@ -629,31 +432,23 @@ async function main() {
           ag.hi.push(hi_val);
           if (date === todayStr) dailyByProv[prov].todayHi = hi_val;
       }
-      if (data.daily.relative_humidity_2m_mean[i]  != null) ag.rh.push(data.daily.relative_humidity_2m_mean[i]);
-      if (data.daily.wind_speed_10m_max[i]         != null) ag.wind.push(data.daily.wind_speed_10m_max[i]);
-      if (data.daily.sunshine_duration[i]          != null) ag.sun.push(data.daily.sunshine_duration[i] / 3600);
-      if (data.daily.precipitation_sum[i]          != null) ag.precip.push(data.daily.precipitation_sum[i]);
-      if (data.daily.uv_index_max[i]               != null) ag.uv.push(data.daily.uv_index_max[i]);
+      if (data.daily.relative_humidity_2m_mean[i] != null) ag.rh.push(data.daily.relative_humidity_2m_mean[i]);
+      if (data.daily.wind_speed_10m_max[i] != null) ag.wind.push(data.daily.wind_speed_10m_max[i]);
+      if (data.daily.sunshine_duration[i] != null) ag.sun.push(data.daily.sunshine_duration[i] / 3600);
+      if (data.daily.precipitation_sum[i] != null) ag.precip.push(data.daily.precipitation_sum[i]);
+      if (data.daily.uv_index_max[i] != null) ag.uv.push(data.daily.uv_index_max[i]);
     });
   });
 
-  const allDates = Object.keys(dailyAgg).sort();
-  const daily = allDates.map(date => {
+  const daily = Object.keys(dailyAgg).sort().map(date => {
     const ag = dailyAgg[date];
     return {
-      date,
-      hi:   avg(ag.hi),
-      rh:   avg(ag.rh),
-      wind: avg(ag.wind),
-      sun:  avg(ag.sun),
-      rain: ag.precip.some(v=>v>0.5) ? 1 : 0, // สรุปเป็น Dummy (มีฝน=1) ให้ตรงกับตอนเทรน
-      uv:   avg(ag.uv),
-      isPast:    date < todayStr,
-      isForecast: date >= todayStr
+      date, hi: avg(ag.hi), rh: avg(ag.rh), wind: avg(ag.wind),
+      sun: avg(ag.sun), rain: ag.precip.some(v=>v>0.5) ? 1 : 0, uv: avg(ag.uv),
+      isPast: date < todayStr, isForecast: date >= todayStr
     };
   });
 
-  // อัปเดต UI สมการตามค่า Hybrid NB2 ใหม่ล่าสุด
   const formulaStr = 
     `ln(λ) = <span style="color:#ff3b3b">-14.327</span> ` +
     `+ <span style="color:#00c8ff">0.148</span>(HI) ` +
@@ -661,16 +456,11 @@ async function main() {
     `+ <span style="color:#00c8ff">0.123</span>(Wind) ` +
     `- <span style="color:#00c8ff">0.066</span>(Rain) ` +
     `+ <span style="color:#00c8ff">0.005</span>(PM2.5_adj)`;
-    
   document.getElementById('formula-concrete').innerHTML = formulaStr;
 
   const statusEl = document.getElementById('model-status');
-  const logoSrc = 'smart_sat_logo.png'; 
-  
-  statusEl.innerHTML = `<img src="${logoSrc}" class="status-logo" alt="SAT Logo" style="height: 24px; width: auto; margin-right: 8px;"> <span>HYBRID NB2 MODEL LOADED</span>`;
-  statusEl.style.borderColor = '#00ff88';
-  statusEl.style.color = '#00ff88';
-  statusEl.style.boxShadow = '0 0 12px rgba(0, 255, 136, 0.2)';
+  statusEl.innerHTML = `<img src="smart_sat_logo.png" class="status-logo" alt="SAT Logo" style="height: 24px; width: auto; margin-right: 8px;"> <span>MACRO-MICRO MODEL LOADED</span>`;
+  statusEl.style.borderColor = '#00ff88'; statusEl.style.color = '#00ff88'; statusEl.style.boxShadow = '0 0 12px rgba(0, 255, 136, 0.2)';
 
   setProgress(55, '🌫️ กำลังดึง PM2.5 จาก WAQI...');
 
@@ -678,227 +468,133 @@ async function main() {
   const pm25Values  = waqiResults.filter(d=>d).map(d => d?.iaqi?.pm25?.v ?? null).filter(v=>v!=null);
   const pm25Avg     = pm25Values.length ? avg(pm25Values) : null;
   const pm25History = WAQI_STATIONS.map((s, i) => ({
-    name: s.name,
-    value: waqiResults[i]?.iaqi?.pm25?.v ?? null,
-    aqi:   waqiResults[i]?.aqi ?? null,
-    city:  waqiResults[i]?.city?.name ?? s.name
+    name: s.name, value: waqiResults[i]?.iaqi?.pm25?.v ?? null, city: waqiResults[i]?.city?.name ?? s.name
   })).filter(d => d.value !== null);
 
-  setProgress(75, '📊 กำลังคำนวณ λ และสร้างกราฟ...');
+  setProgress(75, '📊 กำลังคำนวณ λ แบบ Dual Scale...');
 
-  // คำนวณผู้ป่วยรายวันด้วยสมการ Hybrid ใหม่
   daily.forEach((d, i) => {
     const hiLag = i > 0 ? daily[i-1].hi : d.hi;
-    d.lambda = calcLambdaDaily(d.hi, hiLag, d.wind, d.rain, pm25Avg);
+    const res = calcLambdaDaily(d.hi, hiLag, d.wind, d.rain, pm25Avg);
+    d.lambdaNat = res.national;
+    d.lambdaR4  = res.region4;
   });
 
   const todayData = daily.find(d => d.date === todayStr) ?? daily[daily.length - 1];
   
-  const todayTotalLambda = todayData?.lambda ?? 0;
-  for (const prov in dailyByProv) {
-      if (todayTotalLambda > 0) {
-          dailyByProv[prov].todayLambda = todayTotalLambda * (PROV_POP_RATIO[prov] || 0.125);
-      }
-  }
-
   if (todayData) {
-    document.getElementById('kpi-hi').textContent     = todayData.hi?.toFixed(1) ?? '--';
-    document.getElementById('kpi-lambda').textContent = todayData.lambda?.toFixed(3) ?? '--';
+    document.getElementById('kpi-hi').textContent         = todayData.hi?.toFixed(1) ?? '--';
+    document.getElementById('kpi-lambda-r4').textContent  = todayData.lambdaR4?.toFixed(2) ?? '--';
+    document.getElementById('kpi-lambda-nat').textContent = todayData.lambdaNat?.toFixed(1) ?? '--';
+    
+    // แบ่งยอดลงแผนที่
+    for (const prov in dailyByProv) {
+        if (todayData.lambdaR4 > 0) dailyByProv[prov].todayLambda = todayData.lambdaR4 * (PROV_POP_RATIO[prov] || 0.125);
+    }
   }
   document.getElementById('kpi-pm25').textContent = pm25Avg?.toFixed(1) ?? 'N/A';
 
-  // ═══════════════════════════════════════════
   // MAP
-  // ═══════════════════════════════════════════
   const map = L.map('map-container').setView([14.3, 100.7], 8);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd', maxZoom: 20
-  }).addTo(map);
-
-  function getMarkerColor(hi) {
-      if (!hi) return 'gray';
-      if (hi < 33) return '#a3cc28';
-      if (hi < 42) return '#ffe600';
-      if (hi < 52) return '#ff8c00';
-      return '#ff3b3b';
-  }
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap', subdomains: 'abcd', maxZoom: 20 }).addTo(map);
 
   locEntries.forEach(([prov, coords]) => {
       const pData = dailyByProv[prov];
       const hi = pData.todayHi;
-      const lamb = pData.todayLambda;
-      const mColor = getMarkerColor(hi);
-      const markerHtmlStyles = `
-          background-color: ${mColor};
-          width: 20px; height: 20px;
-          display: block;
-          left: -10px; top: -10px;
-          position: relative;
-          border-radius: 50%;
-          border: 2px solid #FFFFFF;
-          box-shadow: 0 0 8px ${mColor};
-      `;
+      const mColor = (!hi) ? 'gray' : (hi < 33) ? '#a3cc28' : (hi < 42) ? '#ffe600' : (hi < 52) ? '#ff8c00' : '#ff3b3b';
       const icon = L.divIcon({
-          className: "custom-pin",
-          iconAnchor: [0, 0],
-          popupAnchor: [0, -10],
-          html: `<span style="${markerHtmlStyles}" />`
+          className: "custom-pin", iconAnchor: [0, 0], popupAnchor: [0, -10],
+          html: `<span style="background-color:${mColor}; width:20px; height:20px; display:block; left:-10px; top:-10px; position:relative; border-radius:50%; border:2px solid #FFF; box-shadow:0 0 8px ${mColor};" />`
       });
-      const popupContent = `
-          <div class="map-popup-title">${prov}</div>
-          <div class="map-popup-text">🌡️ HI ล่าสุด: <b>${hi ? hi.toFixed(1) : '--'} °C</b></div>
-          <div class="map-popup-text">🏥 คาดการณ์ป่วย: <b>${lamb ? lamb.toFixed(3) : '--'} ราย/วัน</b></div>
-      `;
-      L.marker(coords, {icon: icon}).addTo(map).bindPopup(popupContent);
+      L.marker(coords, {icon: icon}).addTo(map).bindPopup(`<div class="map-popup-title">${prov}</div><div class="map-popup-text">🌡️ HI: <b>${hi ? hi.toFixed(1) : '--'} °C</b></div><div class="map-popup-text">🏥 ป่วย: <b>${pData.todayLambda ? pData.todayLambda.toFixed(2) : '--'} ราย</b></div>`);
   });
 
-  // ═══════════════════════════════════════════
   // PLOTS
-  // ═══════════════════════════════════════════
   const COLORS = ['#ff6b1a','#00c8ff','#ffe04b','#a78bfa','#34d399','#fb7185','#60a5fa','#f97316'];
   const nowISO = new Date().toISOString().slice(0,16);
 
-  // PLOT 1: Heat Index
-  const heatTraces = hourlyByProv.map((p, i) => ({
-    x: p.times, y: p.temps,
-    type:'scatter', mode:'lines', name: p.name,
-    line:{ color: COLORS[i % COLORS.length], width:1.5, shape:'spline' },
-    hovertemplate: `%{y:.1f}°C<extra>${p.name}</extra>`
-  }));
-  Plotly.newPlot('plot-heat', heatTraces, {
-    paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)',
-    font:{ color:'#8899aa', family: 'Sarabun' },
+  Plotly.newPlot('plot-heat', hourlyByProv.map((p, i) => ({
+    x: p.times, y: p.temps, type:'scatter', mode:'lines', name: p.name,
+    line:{ color: COLORS[i % COLORS.length], width:1.5, shape:'spline' }, hovertemplate: `%{y:.1f}°C<extra>${p.name}</extra>`
+  })), {
+    paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)', font:{ color:'#8899aa', family: 'Sarabun' },
     hovermode:'x unified', legend:{ orientation:'h', y:-0.12 },
-    xaxis:{ gridcolor:'#1e2535', tickformat:'%d %b %H:%M', tickfont:{size:11} },
-    yaxis:{ gridcolor:'#1e2535', title:'°C', tickfont:{size:11} },
+    xaxis:{ gridcolor:'#1e2535', tickformat:'%d %b %H:%M', tickfont:{size:11} }, yaxis:{ gridcolor:'#1e2535', title:'°C', tickfont:{size:11} },
     margin:{ l:50, r:20, t:10, b:80 },
-    shapes:[
-      { type:'line', x0:0, x1:1, xref:'paper', y0:40, y1:40, line:{color:'#ff3b3b',width:2,dash:'dash'} },
-      { type:'line', x0:nowISO, x1:nowISO, yref:'paper', y0:0, y1:1, line:{color:'#ffffff',width:1,dash:'dot'} }
-    ],
-    annotations:[{ x:nowISO, y:1, xref:'x', yref:'paper', text:'วันนี้', showarrow:false, font:{color:'#fff',size:10}, xanchor:'left' }]
+    shapes:[ { type:'line', x0:0, x1:1, xref:'paper', y0:40, y1:40, line:{color:'#ff3b3b',width:2,dash:'dash'} }, { type:'line', x0:nowISO, x1:nowISO, yref:'paper', y0:0, y1:1, line:{color:'#ffffff',width:1,dash:'dot'} } ]
   }, { responsive: true, displayModeBar: false });
 
-  // PLOT 2: Environmental variables (ยังเก็บไว้แสดงกราฟได้ปกติ)
-  const envTraces = [
-    { name:'ความชื้น (%)', data: daily.map(d=>d.rh),   color:'#00c8ff', yaxis:'y1' },
-    { name:'ลม (km/h)',    data: daily.map(d=>d.wind), color:'#34d399', yaxis:'y2' },
-    { name:'แสงแดด (hr)', data: daily.map(d=>d.sun),   color:'#ffe04b', yaxis:'y2' },
-    { name:'UV Index',    data: daily.map(d=>d.uv),    color:'#a78bfa', yaxis:'y2' },
+  Plotly.newPlot('plot-env', [
+    { name:'ความชื้น (%)', data: daily.map(d=>d.rh), color:'#00c8ff', yaxis:'y1' },
+    { name:'ลม (km/h)', data: daily.map(d=>d.wind), color:'#34d399', yaxis:'y2' },
   ].map(t => ({
-    x: daily.map(d=>d.date), y: t.data,
-    type:'scatter', mode:'lines+markers', name: t.name, yaxis: t.yaxis,
-    line:{ color:t.color, width:2, shape:'spline' },
-    marker:{ size:4 },
-    hovertemplate:`%{y:.1f}<extra>${t.name}</extra>`
-  }));
-  envTraces.push({
-    x: daily.map(d=>d.date), y: daily.map(d=>d.rain * 15),
-    type:'bar', name:'ฝนตก', yaxis:'y1',
-    marker:{ color:'rgba(0,180,255,.25)', line:{color:'rgba(0,180,255,.5)',width:1} },
-    hovertemplate:`%{x}<br>ฝนตก<extra></extra>`
-  });
-  Plotly.newPlot('plot-env', envTraces, {
-    paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)',
-    font:{ color:'#8899aa', family:'Sarabun' },
-    hovermode:'x unified', barmode:'overlay',
-    legend:{ orientation:'h', y:-0.18 },
-    xaxis:{ gridcolor:'#1e2535', tickfont:{size:11} },
-    yaxis:{ gridcolor:'#1e2535', title:'%', tickfont:{size:11}, side:'left' },
-    yaxis2:{ overlaying:'y', side:'right', title:'ลม/แดด/UV', gridcolor:'transparent', tickfont:{size:11} },
-    margin:{ l:50, r:50, t:10, b:80 },
+    x: daily.map(d=>d.date), y: t.data, type:'scatter', mode:'lines', name: t.name, yaxis: t.yaxis,
+    line:{ color:t.color, width:2, shape:'spline' }, hovertemplate:`%{y:.1f}<extra>${t.name}</extra>`
+  })), {
+    paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)', font:{ color:'#8899aa', family:'Sarabun' },
+    hovermode:'x unified', legend:{ orientation:'h', y:-0.2 },
+    xaxis:{ gridcolor:'#1e2535', tickfont:{size:10} }, yaxis:{ gridcolor:'#1e2535', title:'%', tickfont:{size:10}, side:'left' }, yaxis2:{ overlaying:'y', side:'right', title:'ลม', gridcolor:'transparent', tickfont:{size:10} },
+    margin:{ l:40, r:40, t:10, b:60 },
     shapes:[{ type:'line', x0:todayStr, x1:todayStr, yref:'paper', y0:0, y1:1, line:{color:'#ffffff',width:1,dash:'dot'} }]
   }, { responsive:true, displayModeBar:false });
 
-  // PLOT 3: PM2.5
-  const pm25Colors = pm25History.map(d =>
-    d.value < 25 ? '#34d399' : d.value < 50 ? '#ffe04b' : d.value < 75 ? '#ff8c00' : '#ff3b3b'
-  );
   Plotly.newPlot('plot-pm25', [{
-    x: pm25History.map(d=>d.city),
-    y: pm25History.map(d=>d.value),
-    type:'bar',
-    marker:{ color: pm25Colors, line:{color:'rgba(255,255,255,.1)',width:1} },
-    text: pm25History.map(d=>`${d.value} µg/m³`),
-    textposition:'outside',
-    hovertemplate:'%{x}<br>PM2.5: %{y} µg/m³<extra></extra>'
+    x: pm25History.map(d=>d.city), y: pm25History.map(d=>d.value), type:'bar',
+    marker:{ color: pm25History.map(d => d.value < 25 ? '#34d399' : d.value < 50 ? '#ffe04b' : d.value < 75 ? '#ff8c00' : '#ff3b3b') },
+    text: pm25History.map(d=>`${d.value}`), textposition:'outside', hovertemplate:'%{x}<br>PM2.5: %{y}<extra></extra>'
   }], {
-    paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)',
-    font:{ color:'#8899aa', family:'Sarabun' },
-    xaxis:{ tickfont:{size:12} },
-    yaxis:{ gridcolor:'#1e2535', title:'PM2.5 (µg/m³)', tickfont:{size:11} },
-    margin:{ l:50, r:20, t:10, b:60 },
-    shapes:[
-      { type:'line', x0:0, x1:1, xref:'paper', y0:37.5, y1:37.5, line:{color:'#ffe04b',width:1.5,dash:'dash'} },
-      { type:'line', x0:0, x1:1, xref:'paper', y0:75,   y1:75,   line:{color:'#ff3b3b',width:1.5,dash:'dash'} }
-    ],
-    annotations:[
-      { x:1, y:37.5, xref:'paper', yref:'y', text:'เกณฑ์ไทย (37.5)', showarrow:false, font:{color:'#ffe04b',size:10}, xanchor:'right' },
-      { x:1, y:75,   xref:'paper', yref:'y', text:'อันตราย (75)',     showarrow:false, font:{color:'#ff3b3b',size:10}, xanchor:'right' }
-    ]
+    paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)', font:{ color:'#8899aa', family:'Sarabun' },
+    xaxis:{ tickfont:{size:11} }, yaxis:{ gridcolor:'#1e2535', title:'µg/m³', tickfont:{size:10} }, margin:{ l:40, r:20, t:10, b:40 }
   }, { responsive:true, displayModeBar:false });
 
-  // PLOT 4: Patient forecast
-  const pastPatDays = daily.filter(d => d.isPast && d.lambda !== null);
-  const fcstPatDays = daily.filter(d => d.isForecast && d.lambda !== null);
-  const pastPatBar = {
-    x: pastPatDays.map(d=>d.date),
-    y: pastPatDays.map(d => {
-      const rng = mulberry32(dateToSeed(d.date));
-      const noise = (rng() * 2 - 1) * Math.sqrt(Math.max(d.lambda, 0.001));
-      return Math.max(0, d.lambda + noise * 0.3);
-    }),
-    type:'bar', name:'ผู้ป่วยประมาณการ (ย้อนหลัง)',
-    marker:{ color:'rgba(139,95,60,.7)', line:{color:'rgba(200,140,80,.5)',width:1} },
-    hovertemplate:'%{x}<br>ประมาณ %{y:.3f} ราย/วัน<extra>ย้อนหลัง</extra>'
+  // ── PLOT 4: Stacked Bar (Macro & Micro) ──
+  const pastDays = daily.filter(d => d.isPast && d.lambdaNat !== null);
+  const fcstDays = daily.filter(d => d.isForecast && d.lambdaNat !== null);
+  
+  const tracePastR4 = {
+    x: pastDays.map(d=>d.date), y: pastDays.map(d=>d.lambdaR4),
+    type:'bar', name:'เขต 4 (ย้อนหลัง)', marker:{ color:'#ff6b1a' },
+    hovertemplate:'%{x}<br>เขต 4: %{y:.1f} ราย<extra></extra>'
   };
-  const fcstPatBar = {
-    x: fcstPatDays.map(d=>d.date),
-    y: fcstPatDays.map(d => {
-      const rng = mulberry32(dateToSeed(d.date));
-      const noise = (rng() * 2 - 1) * Math.sqrt(Math.max(d.lambda, 0.001));
-      return Math.max(0, d.lambda + noise * 0.3);
-    }),
-    type:'bar', name:'ผู้ป่วยคาดการณ์ (พยากรณ์)',
-    marker:{ color:'rgba(255,107,26,.7)', line:{color:'rgba(255,150,60,.5)',width:1} },
-    hovertemplate:'%{x}<br>คาด %{y:.3f} ราย/วัน<extra>พยากรณ์</extra>'
+  const tracePastRest = {
+    x: pastDays.map(d=>d.date), y: pastDays.map(d=>d.lambdaNat - d.lambdaR4), // เอาประเทศ หัก เขต 4 ออก
+    type:'bar', name:'ภูมิภาคอื่น (ย้อนหลัง)', marker:{ color:'rgba(255,107,26,0.2)' },
+    hovertemplate:'%{x}<br>ภูมิภาคอื่น: %{y:.1f} ราย<extra></extra>'
   };
-  const lambdaLine = {
-    x: daily.map(d=>d.date),
-    y: daily.map(d=>d.lambda),
-    type:'scatter', mode:'lines+markers', name:'Expected λ (NB2)',
-    line:{ color:'#00c8ff', width:2.5, shape:'spline' },
-    marker:{ size:5 },
-    hovertemplate:'%{x}<br>λ = %{y:.4f} ราย/วัน<extra>Expected</extra>'
+  
+  const traceFcstR4 = {
+    x: fcstDays.map(d=>d.date), y: fcstDays.map(d=>d.lambdaR4),
+    type:'bar', name:'เขต 4 (พยากรณ์)', marker:{ color:'#ffe04b' },
+    hovertemplate:'%{x}<br>เขต 4: %{y:.1f} ราย<extra></extra>'
   };
-  const hiAnnotations = daily.filter(d=>d.hi!==null).map(d => ({
-    x:d.date, y:-0.005, xref:'x', yref:'paper',
-    text:`${d.hi.toFixed(0)}°`, showarrow:false,
-    font:{color:'#445566',size:9}, yanchor:'top'
-  }));
-  Plotly.newPlot('plot-patient', [pastPatBar, fcstPatBar, lambdaLine], {
-    paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)',
-    font:{ color:'#8899aa', family:'Sarabun' },
-    hovermode:'x unified', barmode:'group',
-    legend:{ orientation:'h', y:-0.22 },
+  const traceFcstRest = {
+    x: fcstDays.map(d=>d.date), y: fcstDays.map(d=>d.lambdaNat - d.lambdaR4), // เอาประเทศ หัก เขต 4 ออก
+    type:'bar', name:'ภูมิภาคอื่น (พยากรณ์)', marker:{ color:'rgba(255,224,75,0.2)' },
+    hovertemplate:'%{x}<br>ภูมิภาคอื่น: %{y:.1f} ราย<extra></extra>'
+  };
+
+  const lineNat = {
+    x: daily.map(d=>d.date), y: daily.map(d=>d.lambdaNat),
+    type:'scatter', mode:'lines+markers', name:'Total Expected (ประเทศ)',
+    line:{ color:'#00c8ff', width:2, shape:'spline' }, marker:{ size:4 },
+    hovertemplate:'%{x}<br>รวมประเทศ: %{y:.1f} ราย<extra></extra>'
+  };
+
+  Plotly.newPlot('plot-patient', [tracePastR4, tracePastRest, traceFcstR4, traceFcstRest, lineNat], {
+    paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)', font:{ color:'#8899aa', family:'Sarabun' },
+    hovermode:'x unified', barmode:'stack', // ซ้อนทับกัน
+    legend:{ orientation:'h', y:-0.15 },
     xaxis:{ gridcolor:'#1e2535', tickangle:-30, tickfont:{size:11} },
-    yaxis:{ gridcolor:'#1e2535', title:'ราย/วัน (เขต 4)', rangemode:'tozero', tickfont:{size:11} },
-    margin:{ l:60, r:20, t:10, b:100 },
+    yaxis:{ gridcolor:'#1e2535', title:'จำนวนคาดการณ์ (ราย/วัน)', rangemode:'tozero', tickfont:{size:11} },
+    margin:{ l:50, r:20, t:10, b:80 },
     shapes:[{ type:'line', x0:todayStr, x1:todayStr, yref:'paper', y0:0, y1:1, line:{color:'#ffffff',width:1,dash:'dot'} }],
-    annotations:[
-      { x:todayStr, y:1, xref:'x', yref:'paper', text:'วันนี้', showarrow:false, font:{color:'#fff',size:10}, xanchor:'left' },
-      { x:0.5, y:-0.3, xref:'paper', yref:'paper', text:`ค่าใต้แกน X = HI สูงสุด (°C) ที่ใช้คำนวณ · ${POP_NOTE}`, showarrow:false, font:{color:'#445566',size:10} },
-      ...hiAnnotations
-    ]
+    annotations:[{ x:todayStr, y:1, xref:'x', yref:'paper', text:'วันนี้', showarrow:false, font:{color:'#fff',size:10}, xanchor:'left' }]
   }, { responsive:true, displayModeBar:false });
 
   setProgress(100);
-
   setTimeout(() => {
     map.invalidateSize();
     document.getElementById('loading-overlay').style.opacity = '0';
-    document.getElementById('loading-overlay').style.transition = 'opacity .5s';
     setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
   }, 400);
 }
