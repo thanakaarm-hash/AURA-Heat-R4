@@ -200,15 +200,17 @@
     <div class="section-label">MODEL SPECIFICATION</div>
     <div class="section-title">สมการ Negative Binomial Regression (Hybrid Model)</div>
     
-    <div class="formula" id="formula-display">
-      <div style="color: var(--muted); font-size: 11px; margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 8px;">
-        ln(λ_national) = β₀ + β₁·HI_t + β₂·HI_(t-1) + β₃·Wind_t + β₄·Rain_t + β₅·PM2.5_t<br>
-        λ_region4 = λ_national × (ประชากรเขต 4 / ประชากรประเทศ)
-      </div>
-      <div id="formula-concrete" style="line-height: 1.8;">
-        <span style="color: var(--muted);">กำลังโหลดพารามิเตอร์ของโมเดล...</span>
-      </div>
+  <div class="formula" id="formula-display">
+    <div style="color: var(--muted); font-size: 11px; margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; line-height: 1.6;">
+      ln(λ<sub>national</sub>) = β₀ + β₁(HI<sub>t</sub>) + β₂(HI<sub>t-1</sub>) + β₃(Wind<sub>t</sub>) + β₄(Rain<sub>t</sub>) + β₅(PM2.5<sup>*</sup><sub>t</sub>)<br>
+      <span style="font-size: 10px; opacity: 0.8;"><em>* โดยที่ PM2.5<sup>*</sup><sub>t</sub> = max(0, PM2.5<sub>t</sub> - 37.5)</em></span><br>
+      λ<sub>national</sub> = exp( ln(λ<sub>national</sub>) )<br>
+      λ<sub>region4</sub> = λ<sub>national</sub> × (ประชากรเขต 4 / ประชากรประเทศ)
     </div>
+    <div id="formula-concrete" style="line-height: 1.8;">
+      <span style="color: var(--muted);">กำลังโหลดพารามิเตอร์ของโมเดล...</span>
+    </div>
+  </div>
 
     <div style="font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: -6px; margin-bottom: 20px; padding-left: 4px; font-family: var(--sans);">
       <span style="color: var(--accent2); font-family: var(--mono);">[β₁] อ้างอิง Heat Index:</span>
@@ -278,7 +280,7 @@
       <div>
         <div class="chart-title">Stacked Bar: Hybrid NB2 Regression Model</div>
         <div class="chart-subtitle">
-          แสดงสัดส่วนผู้ป่วยในเขต 4 (สีส้ม/เหลืองเข้ม) เทียบกับภูมิภาคอื่นๆ ทั่วประเทศ (สีจาง) เพื่อให้เห็นภาพรวมของประเทศบนฐานข้อมูลอากาศภาคกลาง
+          แสดงสัดส่วนผู้ป่วยในเขต 4 (สีส้ม/เหลืองเข้ม) เทียบกับภูมิภาคอื่นๆ ทั่วประเทศ (สีจาง) 
         </div>
       </div>
     </div>
