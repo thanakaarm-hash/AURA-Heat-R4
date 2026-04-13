@@ -347,13 +347,19 @@
   <div class="model-panel">
     <div class="section-label">MODEL SPECIFICATION</div>
     <div class="section-title">สมการ Poisson Regression</div>
+    
     <div class="formula" id="formula-display">
       <div style="color: var(--muted); font-size: 11px; margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 8px;">
-        ln(λ) = β₀ + β₁·HI + β₂·HI_lag + β₃·RH + β₄·Wind + β₅·Sun + β₆·Rain + β₇·UV + β₈·PM2.5
+        ln(λ_t) = β₀ + β₁·HI_t + β₂·HI_(t-1) + β₃·RH_t + β₄·Wind_t + β₅·Sun_t + β₆·Rain_t + β₇·UV_t + β₈·PM2.5_t
       </div>
       <div id="formula-concrete" style="line-height: 1.8;">
         <span style="color: var(--muted);">กำลังโหลดพารามิเตอร์ของโมเดล...</span>
       </div>
+    </div>
+
+    <div style="font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: -6px; margin-bottom: 20px; padding-left: 4px; font-family: var(--sans);">
+      <span style="color: var(--accent2); font-family: var(--mono);">[β₁] อ้างอิง Heat Index:</span> Phosri S. et al. (2019). EnvironmentAsia. (RR = 1.16/°C)<br>
+      <span style="color: var(--accent2); font-family: var(--mono);">[β₈] อ้างอิง PM2.5 (Synergistic Factor):</span> WHO Global Air Quality Guidelines (2021) & Brook et al. (2010). AHA Scientific Statement.
     </div>
     <div class="coef-grid" id="coef-grid">
       <div class="coef-card">
