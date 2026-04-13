@@ -70,14 +70,29 @@
     padding: 3px 10px; border-radius: 4px;
     border: 1px solid var(--border); color: var(--muted);
   }
-  #model-status {
+ #model-status {
     font-family: var(--mono); font-size: 11px;
-    padding: 3px 10px; border-radius: 4px;
+    padding: 4px 12px; border-radius: 6px;
     border: 1px solid var(--accent2);
     color: var(--accent2);
-    animation: pulse 2s infinite;
+    background: rgba(0, 0, 0, 0.85); /* กรอบพื้นที่เข้ม */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.5); /* เพิ่มมิติให้กรอบ */
   }
-  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
+
+  /* คลาสใหม่สำหรับโลโก้ */
+  .status-logo {
+    height: 16px; /* ปรับขนาดความสูงโลโก้ได้ตามต้องการ */
+    width: auto;
+    animation: flashAlert 0.8s infinite alternate; /* สั่งให้กระพริบ */
+  }
+
+  @keyframes flashAlert {
+    0% { opacity: 1; filter: drop-shadow(0 0 4px currentColor); }
+    100% { opacity: 0.3; filter: drop-shadow(0 0 0 transparent); }
+  }
 
   /* ── Main layout ── */
   main { position: relative; z-index: 1; padding: 24px 32px 60px; max-width: 1600px; margin: 0 auto; }
@@ -738,11 +753,21 @@ async function main() {
       'ข้อมูล HI ประวัติไม่เพียงพอสำหรับ fitting — ใช้ β₀ fallback (-7.7743)';
   }
 
-  document.getElementById('model-status').textContent = fallback
-    ? '⚠ FALLBACK BETA0'
-    : '✓ MODEL FITTED';
-  document.getElementById('model-status').style.borderColor = fallback ? '#ff3b3b' : '#00ff88';
-  document.getElementById('model-status').style.color       = fallback ? '#ff3b3b' : '#00ff88';
+  const statusEl = document.getElementById('model-status');
+  // ซันใส่ชื่อไฟล์ตามที่พี่อามบอกไว้ หากภาพไม่ขึ้นบนเว็บจริง อย่าลืมใช้ลิงก์ Raw ของ Github นะครับ
+  const logoSrc = 'smart_sat_logo.png'; 
+
+  if (fallback) {
+    statusEl.innerHTML = `<img src="${logoSrc}" class="status-logo" alt="SAT Logo"> <span>FALLBACK BETA0</span>`;
+    statusEl.style.borderColor = '#ff3b3b';
+    statusEl.style.color = '#ff3b3b';
+    statusEl.style.boxShadow = '0 0 12px rgba(255, 59, 59, 0.3)';
+  } else {
+    statusEl.innerHTML = `<img src="${logoSrc}" class="status-logo" alt="SAT Logo"> <span>MODEL FITTED</span>`;
+    statusEl.style.borderColor = '#00ff88';
+    statusEl.style.color = '#00ff88';
+    statusEl.style.boxShadow = '0 0 12px rgba(0, 255, 136, 0.2)';
+  }
 
   setProgress(55, '🌫️ กำลังดึง PM2.5 จาก WAQI...');
 
