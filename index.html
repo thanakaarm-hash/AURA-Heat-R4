@@ -362,9 +362,9 @@
         <div class="coef-desc">ผลความร้อนสะสมสัปดาห์ก่อน (NB2)</div>
       </div>
       <div class="coef-card" style="border-color: var(--accent3);">
-        <div class="coef-name" style="color: var(--accent3);">Status</div>
-        <div class="coef-val" id="error-val" style="color: var(--accent3);">HYBRID</div>
-        <div class="coef-desc">เทรนออฟไลน์สมบูรณ์</div>
+        <div class="coef-name" style="color: var(--accent3);">Model Error (RMSE / MAE)</div>
+        <div class="coef-val" id="error-val" style="color: var(--accent3);">0.562 / 0.353</div>
+        <div class="coef-desc">ราย/วัน (จากข้อมูลเทรน 66 สัปดาห์)</div>
       </div>
     </div>
   </div>
@@ -456,11 +456,15 @@
     Open-Meteo API (อุตุนิยมวิทยา) ·
     World Air Quality Index / WAQI (PM2.5) ·
     DDS กรมควบคุมโรค (ข้อมูลผู้ป่วยระดับประเทศ ปี 2568–2569) <br>
+    
+    <strong>พยากรณ์อากาศ:</strong>
+    ข้อมูลพยากรณ์สภาพอากาศล่วงหน้า 7 วัน (Weather Forecast) ดึงผ่าน Open-Meteo API ซึ่งประมวลผลจากแบบจำลองอุตุนิยมวิทยาระดับโลก (อาทิ ECMWF, GFS, ICON)<br>
+
     <strong>พารามิเตอร์ Hybrid:</strong>
     ใช้สัมประสิทธิ์ความเสี่ยงจากงานวิจัย (Phosri et al. 2019, WHO 2021) ผสานกับน้ำหนักตัวแปรจากการเทรนโมเดล Negative Binomial Regression (NB2) ด้วยข้อมูลจริงของเขตสุขภาพที่ 4 (HI_lag, Wind, Rain) <br>
     <strong>ข้อจำกัด:</strong>
     ตัวเลขผู้ป่วยเป็นค่าคาดหมาย (Expected λ) ไม่ใช่จำนวนผู้ป่วยจริง · ใช้เพื่อประเมินแนวโน้มและสื่อสารความเสี่ยง ไม่ใช่การวินิจฉัยทางคลินิก <br>
-    <strong>เวอร์ชัน:</strong> AURA HEAT R4 v3.0 (Hybrid NB2) · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้าเว็บ
+    <strong>เวอร์ชัน:</strong> AURA HEAT R4 v3.1 (Hybrid NB2) · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้าเว็บ
     
     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border); text-align: center; line-height: 1.8; color: var(--muted); font-size: 12px; font-family: var(--sans);">
       &copy; 2026 Office of Disease Prevention and Control 4 (ODPC 4), Saraburi. All rights reserved.<br>
@@ -661,7 +665,9 @@ async function main() {
   document.getElementById('formula-concrete').innerHTML = formulaStr;
 
   const statusEl = document.getElementById('model-status');
-  statusEl.innerHTML = `<span>HYBRID NB2 MODEL LOADED</span>`;
+  const logoSrc = 'smart_sat_logo.png'; 
+  
+  statusEl.innerHTML = `<img src="${logoSrc}" class="status-logo" alt="SAT Logo" style="height: 24px; width: auto; margin-right: 8px;"> <span>HYBRID NB2 MODEL LOADED</span>`;
   statusEl.style.borderColor = '#00ff88';
   statusEl.style.color = '#00ff88';
   statusEl.style.boxShadow = '0 0 12px rgba(0, 255, 136, 0.2)';
