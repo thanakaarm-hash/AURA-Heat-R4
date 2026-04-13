@@ -294,7 +294,7 @@
     ข้อมูลพยากรณ์สภาพอากาศล่วงหน้า 7 วัน (Weather Forecast) ดึงผ่าน Open-Meteo API ซึ่งประมวลผลจากแบบจำลองอุตุนิยมวิทยาระดับโลก (อาทิ ECMWF, GFS, ICON) โดยใช้พิกัดของเขตสุขภาพที่ 4 เป็นตัวแทนระดับภูมิภาคตอนกลาง<br>
 
     <strong>พารามิเตอร์ Hybrid:</strong>
-    ใช้สัมประสิทธิ์ความเสี่ยงจากงานวิจัย (Pudpong & Hajat 2011, WHO 2021) ผสานกับน้ำหนักตัวแปรจากการเทรนโมเดล Negative Binomial Regression (NB2) ด้วยข้อมูลจริงระดับประเทศเทียบกับสภาพอากาศเขต 4 (HI_lag, Wind, Rain) <br>
+    ใช้สัมประสิทธิ์ความเสี่ยงจากงานวิจัย (Pudpong & Hajat 2011, WHO 2021, Brook R.D., et al. 2010) ผสานกับน้ำหนักตัวแปรจากการเทรนโมเดล Negative Binomial Regression (NB2) ด้วยข้อมูลจริงระดับประเทศเทียบกับสภาพอากาศเขต 4 (HI_lag, Wind, Rain) <br>
     
     <strong>ข้อจำกัด:</strong>
     ตัวเลขผู้ป่วยเป็นค่าคาดหมาย (Expected λ) ทอนสัดส่วนตามประชากรเขต 4 ประกาศกรมการปกครอง สิ้นปี 2568 ไม่ใช่จำนวนผู้ป่วยจริง · ใช้สภาพอากาศเขต 4 เป็น Proxy ของประเทศ อาจมีความคลาดเคลื่อนในวันที่ภาคอื่นมีสภาพอากาศต่างไปอย่างสุดขั้ว · ใช้เพื่อประเมินแนวโน้ม ไม่ใช่การวินิจฉัยทางคลินิก <br>
@@ -465,7 +465,7 @@ async function main() {
     `+ <span style="color:#00c8ff">0.245</span>(HI_lag) ` +
     `+ <span style="color:#00c8ff">0.123</span>(Wind) ` +
     `- <span style="color:#00c8ff">0.066</span>(Rain) ` +
-    `+ <span style="color:#00c8ff">0.005</span>(PM2.5_adj)`;
+    `+ <span style="color:#00c8ff">0.005</span>(PM2.5)`;
   document.getElementById('formula-concrete').innerHTML = formulaStr;
 
   // ── [แก้ไขที่ 3] ขยายขนาดโลโก้ SAT ทางด้านขวาให้โดดเด่นขึ้น ──
