@@ -348,7 +348,12 @@
     <div class="section-label">MODEL SPECIFICATION</div>
     <div class="section-title">สมการ Poisson Regression</div>
     <div class="formula" id="formula-display">
-      ln(λ_t) = β₀ + β₁·HI_t + β₂·HI_(t-1) + β₃·RH_t + β₄·Wind_t + β₅·Sun_t + β₆·Rain_t + β₇·UV_t + β₈·PM2.5_t
+      <div style="color: var(--muted); font-size: 11px; margin-bottom: 8px; border-bottom: 1px dashed var(--border); padding-bottom: 8px;">
+        ln(λ) = β₀ + β₁·HI + β₂·HI_lag + β₃·RH + β₄·Wind + β₅·Sun + β₆·Rain + β₇·UV + β₈·PM2.5
+      </div>
+      <div id="formula-concrete" style="line-height: 1.8;">
+        <span style="color: var(--muted);">กำลังโหลดพารามิเตอร์ของโมเดล...</span>
+      </div>
     </div>
     <div class="coef-grid" id="coef-grid">
       <div class="coef-card">
@@ -772,6 +777,17 @@ async function main() {
   document.getElementById('b0-val').textContent = b0.toFixed(4);
   document.getElementById('b2-val').textContent = b2.toFixed(4);
   document.getElementById('kpi-beta0').textContent = b0.toFixed(3);
+  // สร้าง String สมการพร้อมตัวเลขจริง (ปรับทศนิยมให้ดูสวยงาม ไม่รกตา)
+  // หมายเหตุ: ตามหลักคณิตศาสตร์ Math.exp(A) * Math.exp(B) เท่ากับ ln(Y) = A + B 
+  const formulaStr = 
+    `ln(λ) = <span style="color:#ff3b3b">${b0.toFixed(3)}</span> ` +
+    `+ <span style="color:#00c8ff">0.148</span>(HI) ` +
+    `+ <span style="color:#00c8ff">${b2.toFixed(3)}</span>(HI_lag) <br>` +
+    `<span style="color: var(--muted); font-size: 12px;">` +
+    `+ 0.008(RH-70) - 0.015(Wind-5) + 0.012(Sun-8) - 0.15(Rain) + 0.01(UV-6) + 0.005(PM2.5-37.5)` +
+    `</span>`;
+    
+  document.getElementById('formula-concrete').innerHTML = formulaStr;
   
   let errText = "-- / --";
   if (fallback) {
