@@ -211,10 +211,13 @@
     </div>
 
     <div style="font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: -6px; margin-bottom: 20px; padding-left: 4px; font-family: var(--sans);">
-      <span style="color: var(--accent2); font-family: var(--mono);">[β₁] อ้างอิง Heat Index:</span> Phosri S. et al. (2019). EnvironmentAsia. (RR = 1.16/°C)<br>
+      <span style="color: var(--accent2); font-family: var(--mono);">[β₁] อ้างอิง Heat Index:</span>
+      <a href="https://doi.org/10.1016/j.scitotenv.2011.08.042" target="_blank" style="color: var(--accent2); font-family: var(--sans); text-decoration: underline;">
+    Pudpong, N., & Hajat, S. (2011). High temperature effects on out-patient visits and hospital admissions in Chiang Mai, Thailand. <em>Science of the Total Environment, 409</em>(25), 5260–5267.
+      </a><br>
       <span style="color: var(--accent2); font-family: var(--mono);">[β₅] อ้างอิง PM2.5 (Synergistic Factor):</span> WHO Global Air Quality Guidelines (2021)<br>
       <span style="color: var(--accent3); font-family: var(--mono);">[β₀, β₂, β₃, β₄] Local Calibration:</span> พารามิเตอร์จากการเทรนด้วยข้อมูลของเขตสุขภาพที่ 4 (Negative Binomial NB2, 2026)<br>
-      <span style="color: var(--accent2); font-family: var(--mono);">[Context:]</span> ใช้สภาพอากาศของเขตสุขภาพที่ 4 (ภาคกลาง) เป็นตัวแทนเพื่อทำนายผู้ป่วยระดับประเทศ <br>
+      <span style="color: var(--accent2); font-family: var(--mono);">[Context:]</span> ใช้สภาพอากาศของเขตสุขภาพที่ 4 (ภาคกลาง) เป็นตัวแทนเพื่อทำนายผู้ป่วยระดับประเทศ<br>
     </div>
     
     <div class="coef-grid" id="coef-grid">
@@ -226,7 +229,7 @@
       <div class="coef-card">
         <div class="coef-name">β₁ (HI_t)</div>
         <div class="coef-val">0.1484</div>
-        <div class="coef-desc">อ้างอิงสากล (Phosri 2019)</div>
+        <div class="coef-desc">อ้างอิงสากล (Pudpong & Hajat 2011)</div>
       </div>
       <div class="coef-card">
         <div class="coef-name">β₂ (HI_lag)</div>
@@ -286,7 +289,7 @@
     ข้อมูลพยากรณ์สภาพอากาศล่วงหน้า 7 วัน (Weather Forecast) ดึงผ่าน Open-Meteo API ซึ่งประมวลผลจากแบบจำลองอุตุนิยมวิทยาระดับโลก (อาทิ ECMWF, GFS, ICON) โดยใช้พิกัดของเขตสุขภาพที่ 4 เป็นตัวแทนระดับภูมิภาคตอนกลาง<br>
 
     <strong>พารามิเตอร์ Hybrid:</strong>
-    ใช้สัมประสิทธิ์ความเสี่ยงจากงานวิจัย (Phosri et al. 2019, WHO 2021) ผสานกับน้ำหนักตัวแปรจากการเทรนโมเดล Negative Binomial Regression (NB2) ด้วยข้อมูลจริงระดับประเทศเทียบกับสภาพอากาศเขต 4 (HI_lag, Wind, Rain) <br>
+    ใช้สัมประสิทธิ์ความเสี่ยงจากงานวิจัย (Pudpong & Hajat 2011, WHO 2021) ผสานกับน้ำหนักตัวแปรจากการเทรนโมเดล Negative Binomial Regression (NB2) ด้วยข้อมูลจริงระดับประเทศเทียบกับสภาพอากาศเขต 4 (HI_lag, Wind, Rain) <br>
     
     <strong>ข้อจำกัด:</strong>
     ตัวเลขผู้ป่วยเป็นค่าคาดหมาย (Expected λ) ทอนสัดส่วนตามประชากรเขต 4 ประกาศกรมการปกครอง สิ้นปี 2568 ไม่ใช่จำนวนผู้ป่วยจริง · ใช้สภาพอากาศเขต 4 เป็น Proxy ของประเทศ อาจมีความคลาดเคลื่อนในวันที่ภาคอื่นมีสภาพอากาศต่างไปอย่างสุดขั้ว · ใช้เพื่อประเมินแนวโน้ม ไม่ใช่การวินิจฉัยทางคลินิก <br>
@@ -354,7 +357,7 @@ function calcLambdaDaily(hi, hiLag, wind, rainDay, pm25) {
   if (hi === null) return { national: null, region4: null };
 
   const intercept = -14.3268; 
-  const coefHI    = 0.1484;   
+  const coefHI    = 0.1748;   
   const coefHILag = 0.2450;   
   const coefWind  = 0.1229;   
   const coefRain  = -0.0662;  
