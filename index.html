@@ -60,7 +60,7 @@
     border: 1px solid var(--border); color: var(--muted);
   }
   #model-status {
-    font-family: var(--mono); font-size: 11px; padding: 4px 12px; border-radius: 6px;
+    font-family: var(--sans); font-size: 12px; padding: 4px 16px 4px 6px; border-radius: 6px;
     border: 1px solid var(--accent2); color: var(--accent2); background: rgba(0, 0, 0, 0.85);
     display: flex; align-items: center; gap: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.5);
   }
@@ -212,6 +212,8 @@
 
     <div style="font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: -6px; margin-bottom: 20px; padding-left: 4px; font-family: var(--sans);">
       <span style="color: var(--accent2); font-family: var(--mono);">[Context:]</span> ใช้สภาพอากาศของภาคกลาง (เขต 4) เป็นตัวแทน (Proxy) ของแนวโน้มคลื่นความร้อนระดับประเทศ เนื่องจากลักษณะการปกคลุมของมวลอากาศร้อนในฤดูร้อน<br>
+      <span style="color: var(--accent2); font-family: var(--mono);">[β₁] อ้างอิง Heat Index:</span> Phosri S. et al. (2019). EnvironmentAsia. (RR = 1.16/°C)<br>
+      <span style="color: var(--accent2); font-family: var(--mono);">[β₅] อ้างอิง PM2.5 (Synergistic Factor):</span> WHO Global Air Quality Guidelines (2021)<br>
       <span style="color: var(--accent3); font-family: var(--mono);">[β₀, β₂, β₃, β₄] Local Calibration:</span> พารามิเตอร์จากการเทรนด้วยข้อมูลจริงระดับประเทศ (Negative Binomial NB2, 2026)
     </div>
     
@@ -458,9 +460,12 @@ async function main() {
     `+ <span style="color:#00c8ff">0.005</span>(PM2.5_adj)`;
   document.getElementById('formula-concrete').innerHTML = formulaStr;
 
+  // ── [แก้ไขที่ 3] ขยายขนาดโลโก้ SAT ทางด้านขวาให้โดดเด่นขึ้น ──
   const statusEl = document.getElementById('model-status');
-  statusEl.innerHTML = `<img src="smart_sat_logo.png" class="status-logo" alt="SAT Logo" style="height: 24px; width: auto; margin-right: 8px;"> <span> ตรวจจับเร็ว-ตอบโต้ทัน-ป้องกันได้ </span>`;
-  statusEl.style.borderColor = '#00ff88'; statusEl.style.color = '#00ff88'; statusEl.style.boxShadow = '0 0 12px rgba(0, 255, 136, 0.2)';
+  statusEl.innerHTML = `<img src="smart_sat_logo.png" class="status-logo" alt="SAT Logo" style="height: 38px; width: auto; margin-right: 8px;"> <span style="font-size: 12px; font-weight: bold;">ตรวจจับเร็ว-ตอบโต้ทัน-ป้องกันได้</span>`;
+  statusEl.style.borderColor = '#00ff88'; 
+  statusEl.style.color = '#00ff88'; 
+  statusEl.style.boxShadow = '0 0 12px rgba(0, 255, 136, 0.2)';
 
   setProgress(55, '🌫️ กำลังดึง PM2.5 จาก WAQI...');
 
@@ -524,16 +529,31 @@ async function main() {
     shapes:[ { type:'line', x0:0, x1:1, xref:'paper', y0:40, y1:40, line:{color:'#ff3b3b',width:2,dash:'dash'} }, { type:'line', x0:nowISO, x1:nowISO, yref:'paper', y0:0, y1:1, line:{color:'#ffffff',width:1,dash:'dot'} } ]
   }, { responsive: true, displayModeBar: false });
 
-  Plotly.newPlot('plot-env', [
+  // ── [แก้ไขที่ 2] นำกราฟ Sun, UV, และ Rain (Bar) กลับมาพล็อตให้ครบถ้วน ──
+  const envTraces = [
     { name:'ความชื้น (%)', data: daily.map(d=>d.rh), color:'#00c8ff', yaxis:'y1' },
     { name:'ลม (km/h)', data: daily.map(d=>d.wind), color:'#34d399', yaxis:'y2' },
+    { name:'แสงแดด (hr)', data: daily.map(d=>d.sun), color:'#ffe04b', yaxis:'y2' },
+    { name:'UV Index', data: daily.map(d=>d.uv), color:'#a78bfa', yaxis:'y2' }
   ].map(t => ({
-    x: daily.map(d=>d.date), y: t.data, type:'scatter', mode:'lines', name: t.name, yaxis: t.yaxis,
-    line:{ color:t.color, width:2, shape:'spline' }, hovertemplate:`%{y:.1f}<extra>${t.name}</extra>`
-  })), {
+    x: daily.map(d=>d.date), y: t.data, type:'scatter', mode:'lines+markers', name: t.name, yaxis: t.yaxis,
+    line:{ color:t.color, width:2, shape:'spline' }, marker:{ size:4 }, hovertemplate:`%{y:.1f}<extra>${t.name}</extra>`
+  }));
+  
+  // เพิ่มแท่งกราฟฝน (คูณสเกลภาพให้เห็นชัดเจนบนแกน 0-100 แต่ไม่กระทบสมการ)
+  envTraces.push({
+    x: daily.map(d=>d.date), y: daily.map(d=>d.rain * 15),
+    type:'bar', name:'ฝนตก', yaxis:'y1',
+    marker:{ color:'rgba(0,180,255,.25)', line:{color:'rgba(0,180,255,.5)',width:1} },
+    hovertemplate:`%{x}<br>ฝนตก<extra></extra>`
+  });
+
+  Plotly.newPlot('plot-env', envTraces, {
     paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)', font:{ color:'#8899aa', family:'Sarabun' },
-    hovermode:'x unified', legend:{ orientation:'h', y:-0.2 },
-    xaxis:{ gridcolor:'#1e2535', tickfont:{size:10} }, yaxis:{ gridcolor:'#1e2535', title:'%', tickfont:{size:10}, side:'left' }, yaxis2:{ overlaying:'y', side:'right', title:'ลม', gridcolor:'transparent', tickfont:{size:10} },
+    hovermode:'x unified', barmode:'overlay', legend:{ orientation:'h', y:-0.2 },
+    xaxis:{ gridcolor:'#1e2535', tickfont:{size:10} }, 
+    yaxis:{ gridcolor:'#1e2535', title:'%', tickfont:{size:10}, side:'left' }, 
+    yaxis2:{ overlaying:'y', side:'right', title:'ลม/แดด/UV', gridcolor:'transparent', tickfont:{size:10} },
     margin:{ l:40, r:40, t:10, b:60 },
     shapes:[{ type:'line', x0:todayStr, x1:todayStr, yref:'paper', y0:0, y1:1, line:{color:'#ffffff',width:1,dash:'dot'} }]
   }, { responsive:true, displayModeBar:false });
