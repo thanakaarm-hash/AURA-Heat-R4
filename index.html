@@ -4,10 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AURA Heat R4 · ระบบเฝ้าระวังความร้อน เขตสุขภาพที่ 4 (National Proxy)</title>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y1L8SHYFWR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-Y1L8SHYFWR');
+</script>
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -54,10 +62,12 @@
   }
   .logo-text { font-size: 13px; line-height: 1.3; }
   .logo-text strong { display: block; font-size: 18px; letter-spacing: 4px; color: var(--accent); font-family: var(--mono); }
-  .header-right { display: flex; gap: 20px; align-items: center; }
+  
+  .header-right { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  
   .badge {
     font-family: var(--mono); font-size: 11px; padding: 3px 10px; border-radius: 4px;
-    border: 1px solid var(--border); color: var(--muted);
+    border: 1px solid var(--border); color: var(--muted); display: flex; align-items: center; gap: 6px;
   }
   #model-status {
     font-family: var(--sans); font-size: 12px; padding: 4px 16px 4px 6px; border-radius: 6px;
@@ -112,18 +122,6 @@
   .footnote { font-size: 11px; color: var(--muted); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 40px; }
   .footnote strong { color: var(--text); }
 
-  .health-table-wrap { overflow-x: auto; margin-top: 20px; border-radius: 8px; border: 1px solid var(--border); }
-  .health-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .health-table th, .health-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
-  .health-table th { background: #222; color: #fff; text-align: center;}
-  .health-table td:last-child, .health-table th:last-child { border-right: none;}
-  .health-table tr:last-child td { border-bottom: none;}
-  
-  .lv-watch { background-color: #a3cc28; color: #000; font-weight: bold; text-align: center;}
-  .lv-warn { background-color: #ffe600; color: #000; font-weight: bold; text-align: center;}
-  .lv-danger { background-color: #ff8c00; color: #000; font-weight: bold; text-align: center;}
-  .lv-critical { background-color: #ff3b3b; color: #000; font-weight: bold; text-align: center;}
-
   #map-container { width: 100%; height: 400px; border-radius: 12px; border: 1px solid var(--border); z-index: 10; }
   .leaflet-popup-content-wrapper { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
   .leaflet-popup-tip { background: var(--surface); border-top: 1px solid var(--border); border-left: 1px solid var(--border); }
@@ -132,7 +130,8 @@
 
   @media (max-width: 600px) {
     main { padding: 16px; }
-    header { padding: 10px 16px; }
+    header { padding: 10px 16px; flex-direction: column; align-items: flex-start; gap: 16px;}
+    .header-right { width: 100%; justify-content: flex-start;}
     .kpi-value { font-size: 24px; }
   }
 </style>
@@ -160,6 +159,13 @@
     </div>
   </div>
   <div class="header-right">
+    <span class="badge" style="border-color: rgba(0, 200, 255, 0.3); background: rgba(0, 200, 255, 0.05);">
+        <span style="color: var(--accent2);">👁️ VISITS:</span>
+        <span id="count-total" style="color: #fff; font-weight: bold;">...</span> 
+        <span style="color: var(--muted); margin: 0 4px;">|</span>
+        <span style="color: var(--accent);">เขต 4:</span>
+        <span id="count-r4" style="color: #fff; font-weight: bold;">...</span>
+    </span>
     <span class="badge">เขต 4 ประชากร 5.4M / ประเทศ 65.8M</span>
     <span id="model-status">⬤ LOADING MODEL...</span>
   </div>
@@ -301,7 +307,7 @@
     <strong>ข้อจำกัด:</strong>
     ตัวเลขผู้ป่วยเป็นค่าคาดหมาย (Expected λ) ทอนสัดส่วนตามประชากรเขต 4 ประกาศกรมการปกครอง สิ้นปี 2568 ไม่ใช่จำนวนผู้ป่วยจริง · ใช้สภาพอากาศเขต 4 เป็น Proxy ของประเทศ อาจมีความคลาดเคลื่อนในวันที่ภาคอื่นมีสภาพอากาศต่างไปอย่างสุดขั้ว · ใช้เพื่อประเมินแนวโน้ม ไม่ใช่การวินิจฉัยทางคลินิก <br>
     
-    <strong>เวอร์ชัน:</strong> AURA HEAT R4 v3.3 (1404690115) · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้าเว็บ
+    <strong>เวอร์ชัน:</strong> AURA HEAT R4 v3.6 (1404691037) · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้าเว็บ
     
     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border); text-align: center; line-height: 1.8; color: var(--muted); font-size: 12px; font-family: var(--sans);">
       &copy; 2026 Office of Disease Prevention and Control 4 (ODPC 4), Saraburi. All rights reserved.<br>
@@ -310,17 +316,90 @@
   </div>
 
 </main>
+  
+<!-- Elfsight Form Builder | Untitled Form Builder -->
+<script src="https://elfsightcdn.com/platform.js" async></script>
+<div class="elfsight-app-e9e811e9-fe40-4c32-ae9d-4c030775132f" data-elfsight-app-lazy></div>
+  
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+// 🔑 ใส่ Project URL และ API Key ตรงนี้เลยครับ
+const supabaseUrl = 'https://kegmmneqftbvjweonlsk.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZ21tbmVxZnRidmp3ZW9ubHNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMDYxNzQsImV4cCI6MjA5MTY4MjE3NH0.qEtf3z-J4F6YmIPSxS5NmVX3SUL_Ezv1cFa3CoXw_uQ';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  
+// ═══════════════════════════════════════════════════════════
+// VISITOR TRACKING LOGIC (IP Geolocation & Supabase)
+// ═══════════════════════════════════════════════════════════
+async function trackVisitor() {
+    try {
+        // 1. เช็คตำแหน่ง IP ของผู้เข้าชม
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+
+        const r4Provinces = [
+            'Nonthaburi', 'Pathum Thani', 'Phra Nakhon Si Ayutthaya', 'Saraburi', 
+            'Lopburi', 'Lop Buri', 'Sing Buri', 'Ang Thong', 'Nakhon Nayok',
+            'นนทบุรี', 'ปทุมธานี', 'พระนครศรีอยุธยา', 'อยุธยา', 'สระบุรี', 'ลพบุรี', 'สิงห์บุรี', 'อ่างทอง', 'นครนายก'
+        ];
+
+        let isRegion4 = false;
+        if (data.region && r4Provinces.includes(data.region)) isRegion4 = true;
+        if (data.city && r4Provinces.includes(data.city)) isRegion4 = true;
+
+        // 2. ดึงค่ายอดวิวปัจจุบันจาก Supabase (แถวแรก)
+        const { data: stats, error: fetchError } = await supabase
+            .from('visitor_stats')
+            .select('*')
+            .limit(1)
+            .single();
+
+        if (fetchError) throw fetchError;
+
+        let countTotal = stats.total_visits || 0;
+        let countR4 = stats.r4_visits || 0;
+        let rowId = stats.id; // ใช้ ID ของแถวในการอ้างอิง
+
+        // 3. เช็คว่าเป็นการเปิดเว็บครั้งแรกใน Session นี้หรือไม่
+        if (!sessionStorage.getItem('visited_this_session')) {
+            countTotal++; // บวกยอดรวม
+            if (isRegion4) countR4++; // ถ้าอยู่เขต 4 ให้บวกยอดเขต 4 ด้วย
+            
+            // 4. ส่งข้อมูลที่บวกแล้วกลับไปบันทึกทับใน Supabase
+            const { error: updateError } = await supabase
+                .from('visitor_stats')
+                .update({ total_visits: countTotal, r4_visits: countR4 })
+                .eq('id', rowId); // อัปเดตเฉพาะแถวนี้
+
+            if (!updateError) {
+                // ถ้าบันทึกสำเร็จ ให้จดจำไว้ว่าเข้าเว็บแล้ว จะได้ไม่บวกซ้ำเวลากด Refresh
+                sessionStorage.setItem('visited_this_session', 'true');
+            } else {
+                console.error("Supabase update error:", updateError);
+            }
+        }
+
+        // 5. อัปเดตตัวเลขโชว์บนหน้าเว็บ
+        document.getElementById('count-total').textContent = countTotal.toLocaleString();
+        document.getElementById('count-r4').textContent = countR4.toLocaleString();
+
+    } catch (error) {
+        console.error("Tracking error:", error);
+        // ถ้า Database พังหรือเน็ตหลุด ให้ขึ้น Offline
+        document.getElementById('count-total').textContent = "Offline";
+        document.getElementById('count-r4').textContent = "Offline";
+    }
+}
+
 // ═══════════════════════════════════════════════════════════
 // CONSTANTS & HYBRID PARAMETERS
 // ═══════════════════════════════════════════════════════════
 const WAQI_TOKEN   = 'd128f19a81ec49b868126c970ca3c6ab501c8b52';
 
-// อัปเดตข้อมูลประชากร อ้างอิงประกาศกรมการปกครอง สิ้นปี 2568
 const POP_NATIONAL = 65809011; 
 const POP_REGION4  = 5448024;  
-const SCALE_FACTOR = POP_REGION4 / POP_NATIONAL; // ≈ 0.08278 (8.27% ของประเทศ)
+const SCALE_FACTOR = POP_REGION4 / POP_NATIONAL; 
 
 const LOCATIONS = {
   'นนทบุรี':    [13.8591, 100.5217],
@@ -383,10 +462,7 @@ function calcLambdaDaily(hi, hiLag, wind, rainDay, pm25) {
                    (coefRain * rV) + 
                    (coefPM25 * Math.max(0, pmV - 37.5));
 
-  // ค่าระดับประเทศ (National)
   const lambdaWeekNational = Math.exp(lnLambda);
-  
-  // ค่าระดับเขต 4 (ทอนสัดส่วน 8.27%)
   const lambdaWeekRegion4 = lambdaWeekNational * SCALE_FACTOR;
 
   return {
@@ -414,6 +490,8 @@ async function fetchWAQI(stationQuery) {
 }
 
 async function main() {
+  trackVisitor();
+
   const today    = new Date(); today.setHours(0,0,0,0);
   const startStr = fmtDate(addDays(today, -8));
   const endStr   = fmtDate(addDays(today,  7));
@@ -470,9 +548,8 @@ async function main() {
     `+ <span style="color:#00c8ff">0.005</span>(PM2.5)`;
   document.getElementById('formula-concrete').innerHTML = formulaStr;
 
-  // ── [แก้ไขที่ 3] ขยายขนาดโลโก้ SAT ทางด้านขวาให้โดดเด่นขึ้น ──
   const statusEl = document.getElementById('model-status');
-  statusEl.innerHTML = `<img src="smart_sat_logo.png" class="status-logo" alt="SAT Logo" style="height: 38px; width: auto; margin-right: 8px;"> <span style="font-size: 12px; font-weight: bold;">ตรวจจับเร็ว-ตอบโต้ทัน-ป้องกันได้</span>`;
+  statusEl.innerHTML = `<img src="smart_sat_logo.png" class="status-logo" alt="SAT Logo" style="height: 38px; width: auto; margin-right: 8px;" onerror="this.style.display='none'"> <span style="font-size: 12px; font-weight: bold;">ตรวจจับเร็ว-ตอบโต้ทัน-ป้องกันได้</span>`;
   statusEl.style.borderColor = '#00ff88'; 
   statusEl.style.color = '#00ff88'; 
   statusEl.style.boxShadow = '0 0 12px rgba(0, 255, 136, 0.2)';
@@ -502,14 +579,12 @@ async function main() {
     document.getElementById('kpi-lambda-r4').textContent  = todayData.lambdaR4?.toFixed(2) ?? '--';
     document.getElementById('kpi-lambda-nat').textContent = todayData.lambdaNat?.toFixed(1) ?? '--';
     
-    // แบ่งยอดลงแผนที่
     for (const prov in dailyByProv) {
         if (todayData.lambdaR4 > 0) dailyByProv[prov].todayLambda = todayData.lambdaR4 * (PROV_POP_RATIO[prov] || 0.125);
     }
   }
   document.getElementById('kpi-pm25').textContent = pm25Avg?.toFixed(1) ?? 'N/A';
 
-  // MAP
   const map = L.map('map-container').setView([14.3, 100.7], 8);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap', subdomains: 'abcd', maxZoom: 20 }).addTo(map);
 
@@ -524,7 +599,6 @@ async function main() {
       L.marker(coords, {icon: icon}).addTo(map).bindPopup(`<div class="map-popup-title">${prov}</div><div class="map-popup-text">🌡️ HI: <b>${hi ? hi.toFixed(1) : '--'} °C</b></div><div class="map-popup-text">🏥 ป่วย: <b>${pData.todayLambda ? pData.todayLambda.toFixed(2) : '--'} ราย</b></div>`);
   });
 
-  // PLOTS
   const COLORS = ['#ff6b1a','#00c8ff','#ffe04b','#a78bfa','#34d399','#fb7185','#60a5fa','#f97316'];
   const nowISO = new Date().toISOString().slice(0,16);
 
@@ -539,7 +613,6 @@ async function main() {
     shapes:[ { type:'line', x0:0, x1:1, xref:'paper', y0:40, y1:40, line:{color:'#ff3b3b',width:2,dash:'dash'} }, { type:'line', x0:nowISO, x1:nowISO, yref:'paper', y0:0, y1:1, line:{color:'#ffffff',width:1,dash:'dot'} } ]
   }, { responsive: true, displayModeBar: false });
 
-  // ── [แก้ไขที่ 2] นำกราฟ Sun, UV, และ Rain (Bar) กลับมาพล็อตให้ครบถ้วน ──
   const envTraces = [
     { name:'ความชื้น (%)', data: daily.map(d=>d.rh), color:'#00c8ff', yaxis:'y1' },
     { name:'ลม (km/h)', data: daily.map(d=>d.wind), color:'#34d399', yaxis:'y2' },
@@ -550,7 +623,6 @@ async function main() {
     line:{ color:t.color, width:2, shape:'spline' }, marker:{ size:4 }, hovertemplate:`%{y:.1f}<extra>${t.name}</extra>`
   }));
   
-  // เพิ่มแท่งกราฟฝน (คูณสเกลภาพให้เห็นชัดเจนบนแกน 0-100 แต่ไม่กระทบสมการ)
   envTraces.push({
     x: daily.map(d=>d.date), y: daily.map(d=>d.rain * 15),
     type:'bar', name:'ฝนตก', yaxis:'y1',
@@ -577,7 +649,6 @@ async function main() {
     xaxis:{ tickfont:{size:11} }, yaxis:{ gridcolor:'#1e2535', title:'µg/m³', tickfont:{size:10} }, margin:{ l:40, r:20, t:10, b:40 }
   }, { responsive:true, displayModeBar:false });
 
-  // ── PLOT 4: Stacked Bar (Macro & Micro) ──
   const pastDays = daily.filter(d => d.isPast && d.lambdaNat !== null);
   const fcstDays = daily.filter(d => d.isForecast && d.lambdaNat !== null);
   
@@ -587,7 +658,7 @@ async function main() {
     hovertemplate:'%{x}<br>เขต 4: %{y:.1f} ราย<extra></extra>'
   };
   const tracePastRest = {
-    x: pastDays.map(d=>d.date), y: pastDays.map(d=>d.lambdaNat - d.lambdaR4), // เอาประเทศ หัก เขต 4 ออก
+    x: pastDays.map(d=>d.date), y: pastDays.map(d=>d.lambdaNat - d.lambdaR4),
     type:'bar', name:'ภูมิภาคอื่น (ย้อนหลัง)', marker:{ color:'rgba(255,107,26,0.2)' },
     hovertemplate:'%{x}<br>ภูมิภาคอื่น: %{y:.1f} ราย<extra></extra>'
   };
@@ -598,7 +669,7 @@ async function main() {
     hovertemplate:'%{x}<br>เขต 4: %{y:.1f} ราย<extra></extra>'
   };
   const traceFcstRest = {
-    x: fcstDays.map(d=>d.date), y: fcstDays.map(d=>d.lambdaNat - d.lambdaR4), // เอาประเทศ หัก เขต 4 ออก
+    x: fcstDays.map(d=>d.date), y: fcstDays.map(d=>d.lambdaNat - d.lambdaR4),
     type:'bar', name:'ภูมิภาคอื่น (พยากรณ์)', marker:{ color:'rgba(255,224,75,0.2)' },
     hovertemplate:'%{x}<br>ภูมิภาคอื่น: %{y:.1f} ราย<extra></extra>'
   };
@@ -612,7 +683,7 @@ async function main() {
 
   Plotly.newPlot('plot-patient', [tracePastR4, tracePastRest, traceFcstR4, traceFcstRest, lineNat], {
     paper_bgcolor:'transparent', plot_bgcolor:'rgba(255,255,255,.02)', font:{ color:'#8899aa', family:'Sarabun' },
-    hovermode:'x unified', barmode:'stack', // ซ้อนทับกัน
+    hovermode:'x unified', barmode:'stack',
     legend:{ orientation:'h', y:-0.15 },
     xaxis:{ gridcolor:'#1e2535', tickangle:-30, tickfont:{size:11} },
     yaxis:{ gridcolor:'#1e2535', title:'จำนวนคาดการณ์ (ราย/วัน)', rangemode:'tozero', tickfont:{size:11} },
