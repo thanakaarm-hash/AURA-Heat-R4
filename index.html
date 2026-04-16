@@ -262,7 +262,39 @@
     </div>
     <div id="plot-heat" class="chart-plot tall"></div>
   </div>
-
+<div class="health-table-wrap" style="border-radius: 8px; overflow: hidden; border: 1px solid #333; margin-top: 20px;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; font-family: var(--sans);">
+          <thead>
+              <tr style="background-color: #2b2b2b; color: #ffffff; text-align: center;">
+                  <th style="padding: 14px 12px; width: 15%; border-right: 1px solid #444; font-weight: 600;">ระดับ</th>
+                  <th style="padding: 14px 12px; width: 20%; border-right: 1px solid #444; font-weight: 600;">ดัชนีความร้อน (°C)</th>
+                  <th style="padding: 14px 12px; width: 65%; font-weight: 600;">ผลกระทบต่อสุขภาพ</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr style="background-color: #b5d522; color: #111;">
+                  <td style="padding: 12px; text-align: center; font-weight: 700; border-right: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1);">เฝ้าระวัง</td>
+                  <td style="padding: 12px; text-align: center; font-weight: 700; border-right: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); font-size: 16px;">27.0 - 32.9</td>
+                  <td style="padding: 12px; border-bottom: 1px solid rgba(0,0,0,0.1);">เมื่อสัมผัสความร้อน และทำกิจกรรมกลางแจ้งเป็นเวลานาน อาจทำให้ร่างกายเกิดอาการเบื้องต้น เช่น อ่อนเพลีย ปวดศีรษะ ผื่นจากความร้อน บวมจากความร้อน ปวดเมื่อยตามร่างกาย นำไปสู่การเกิดตะคริวจากความร้อนได้</td>
+              </tr>
+              <tr style="background-color: #ffea00; color: #111;">
+                  <td style="padding: 12px; text-align: center; font-weight: 700; border-right: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1);">เตือนภัย</td>
+                  <td style="padding: 12px; text-align: center; font-weight: 700; border-right: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); font-size: 16px;">33.0 - 41.9</td>
+                  <td style="padding: 12px; border-bottom: 1px solid rgba(0,0,0,0.1);">เมื่อสัมผัสความร้อน และทำกิจกรรมกลางแจ้งเป็นเวลานาน อาจมีความเสี่ยงที่จะเกิดโรคเพลียแดด (Heat exhaustion) และเป็นตะคริวจากความร้อนได้ และอาจส่งผลให้เกิดโรคลมร้อน หรือ ฮีทสโตรก (Heat stroke)</td>
+              </tr>
+              <tr style="background-color: #ff8800; color: #111;">
+                  <td style="padding: 12px; text-align: center; font-weight: 700; border-right: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1);">อันตราย</td>
+                  <td style="padding: 12px; text-align: center; font-weight: 700; border-right: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1); font-size: 16px;">42.0 - 51.9</td>
+                  <td style="padding: 12px; border-bottom: 1px solid rgba(0,0,0,0.1);">เมื่อสัมผัสความร้อน และทำกิจกรรมกลางแจ้งเป็นเวลานาน อาจทำให้เป็นตะคริวจากความร้อน และเกิดโรคเพลียแดดจากความร้อน (Heat exhaustion) และเพิ่มความเสี่ยงต่อการเกิดโรคลมร้อน หรือ ฮีทสโตรก (Heat stroke) ได้ หากสัมผัสความร้อนอย่างต่อเนื่อง</td>
+              </tr>
+              <tr style="background-color: #ff3322; color: #111;">
+                  <td style="padding: 12px; text-align: center; font-weight: 700; border-right: 1px solid rgba(0,0,0,0.1);">อันตรายมาก</td>
+                  <td style="padding: 12px; text-align: center; font-weight: 700; border-right: 1px solid rgba(0,0,0,0.1); font-size: 16px;">>= 52.0</td>
+                  <td style="padding: 12px;">เมื่อสัมผัสความร้อน และทำกิจกรรมกลางแจ้งเป็นเวลานานอย่างต่อเนื่อง มีความ<span style="text-decoration: underline; font-weight: 700;">เสี่ยงสูงมาก</span>ที่เกิดโรคลมร้อน หรือ ฮีทสโตรก (Heat stroke)</td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
   <div class="section-title">📊 ตัวแปรสิ่งแวดล้อมที่เกี่ยวข้อง (รายวัน) และ PM2.5 จาก WAQI</div>
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
       <div class="chart-wrap" style="margin-bottom: 0;">
